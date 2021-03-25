@@ -1,0 +1,15 @@
+{
+  "name": "photolord",
+  "version": "1.0.0",
+  "description": "Photo management application based on web tech. Analyze the photos located on your local server, and provide various convenient ways to maintain the photos. Such as object recognition, face recognition, location mark, artificial label, then, you can use any keyword to search photo.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luoye-fe/photolord.git"
+  },
+  "keywords": [],
+  "author": "luoye <luoyefe@gmail.com>",
+  "license": "MIT"
+}
