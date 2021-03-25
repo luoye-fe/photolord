@@ -2,14 +2,42 @@
   "name": "photolord",
   "version": "1.0.0",
   "description": "Photo management application based on web tech. Analyze the photos located on your local server, and provide various convenient ways to maintain the photos. Such as object recognition, face recognition, location mark, artificial label, then, you can use any keyword to search photo.",
+  "keywords": [],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@commitlint/cli": "^12.0.1",
+    "@commitlint/config-conventional": "^12.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "@typescript-eslint/parser": "^4.19.0",
+    "eslint": "^7.22.0",
+    "husky": "^5.2.0",
+    "lint-staged": "^10.5.4",
+    "stylelint": "^13.12.0",
+    "stylelint-config-standard": "^21.0.0",
+    "typescript": "^4.2.3"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/luoye-fe/photolord.git"
   },
-  "keywords": [],
   "author": "luoye <luoyefe@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "commitlint": {
+    "extend": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged --no-stash",
+      "commit-msg": "commitlint -e"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint",
+    "*.{less,scss}": "stylelint"
+  }
 }
