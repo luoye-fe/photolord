@@ -10,6 +10,7 @@
     "semi": [2, "always"],
     "indent": ["error", 2],
     "quotes": [2, "single"],
-    "comma-dangle": [2, "always-multiline"]
+    "comma-dangle": [2, "always-multiline"],
+    "@typescript-eslint/explicit-module-boundary-types": 0
   }
 }
