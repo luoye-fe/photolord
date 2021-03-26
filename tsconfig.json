@@ -13,7 +13,8 @@
     "pretty": true,
     "declaration": true,
     "jsx": "react",
-    "typeRoots": [ "./typings", "./node_modules/@types"],
+    "typeRoots": ["./typings", "./node_modules/@types"],
+    "types": ["./src/typings"],
     "baseUrl": "src",
     "outDir": "dist",
     "paths": {
@@ -27,6 +28,7 @@
   "exclude": [
     "dist",
     "node_modules",
-    "test"
+    "test",
+    "web-ui"
   ]
 }
