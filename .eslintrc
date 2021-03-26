@@ -11,6 +11,8 @@
     "indent": ["error", 2],
     "quotes": [2, "single"],
     "comma-dangle": [2, "always-multiline"],
+    "@typescript-eslint/semi": ["error"],
+    "@typescript-eslint/indent": ["error", 2],
     "@typescript-eslint/explicit-module-boundary-types": 0
   }
 }

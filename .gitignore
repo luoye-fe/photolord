@@ -206,3 +206,10 @@ run
 build
 public
 
+db
+!db/.gitkeep
+
+tf-model/efficientnet/*
+!tf-model/efficientnet/.gitkeep
+
+!src/typings
