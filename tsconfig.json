@@ -12,6 +12,7 @@
     "stripInternal": true,
     "pretty": true,
     "declaration": true,
+    "jsx": "react",
     "typeRoots": [ "./typings", "./node_modules/@types"],
     "baseUrl": "src",
     "outDir": "dist",

@@ -1,8 +1,7 @@
 import React from 'react';
-import Guide from '@/components/Guide';
 
 const Home = () => {
-  return <Guide />;
+  return <code>welcome photolord!</code>;
 };
 
 export default Home;
