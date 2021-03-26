@@ -3,5 +3,5 @@ import { EggPlugin } from 'egg';
 
 export default {
   logrotator: false,
-  static: false,
+  static: true,
 } as EggPlugin;

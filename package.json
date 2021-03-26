@@ -6,21 +6,22 @@
   "scripts": {
     "start": "npm run build && egg-scripts start --daemon --title=photolord --framework=@midwayjs/web",
     "stop": "egg-scripts stop --title=photolord",
-    "start_build": "npm run build && cross-env NODE_ENV=development midway-bin dev",
     "dev": "cross-env ets && cross-env NODE_ENV=local midway-bin dev --ts",
+    "dev-ui": "cd web-ui && icejs start",
     "test": "midway-bin test --ts",
-    "cov": "midway-bin cov",
-    "lint": "mwts check",
-    "lint:fix": "mwts fix",
-    "ci": "npm run cov",
-    "build": "midway-bin build -c",
+    "build": "bash ./scripts/build.sh",
     "check": "luckyeye"
   },
   "dependencies": {
     "@midwayjs/decorator": "^2.9.1",
     "@midwayjs/web": "^2.9.1",
+    "@types/react": "^16.9.20",
+    "@types/react-dom": "^16.9.5",
+    "axios": "^0.21.1",
     "egg": "^2.29.3",
     "egg-scripts": "^2.13.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "tsconfig-paths": "^3.9.0"
   },
   "devDependencies": {
@@ -35,14 +36,17 @@
     "@typescript-eslint/parser": "^4.19.0",
     "@zerollup/ts-transform-paths": "^1.7.18",
     "cross-env": "^6.0.0",
-    "eslint": "^7.22.0",
+    "eslint": "^6.8.0",
     "husky": "^5.2.0",
     "jest": "^26.4.0",
     "lint-staged": "^10.5.4",
-    "stylelint": "^13.12.0",
+    "stylelint": "^13.7.2",
     "stylelint-config-standard": "^21.0.0",
     "ts-jest": "^26.2.0",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "@iceworks/spec": "^1.0.0",
+    "ice.js": "^1.0.0",
+    "@ali/build-plugin-ice-def": "^0.1.0"
   },
   "repository": {
     "type": "git",

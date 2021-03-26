@@ -14,7 +14,6 @@
     "declaration": true,
     "typeRoots": [ "./typings", "./node_modules/@types"],
     "baseUrl": "src",
-    "rootDir": "src",
     "outDir": "dist",
     "paths": {
       "@/*": ["./*"]
@@ -23,6 +22,7 @@
       "transform": "@zerollup/ts-transform-paths"
     }]
   },
+  "include": ["src"],
   "exclude": [
     "dist",
     "node_modules",
