@@ -9,7 +9,6 @@ export class HomeController {
   @Inject()
   homeService: HomeService;
 
-
   @Get('/')
   async home() {
     return `Hello ${this.homeService.index()}!`;
