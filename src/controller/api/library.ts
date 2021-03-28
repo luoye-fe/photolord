@@ -5,7 +5,11 @@ import ApiLibraryService from '@/service/api/library';
 import { IResponse } from '@/typings';
 
 @Provide()
-@Controller('/api/library')
+@Controller('/api/library', {
+  middleware: [
+    'userMiddleware',
+  ],
+})
 export class ApiLibraryController {
 
   @Inject()

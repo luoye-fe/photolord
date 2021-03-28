@@ -14,6 +14,14 @@ import {
   timestamps: false,
 })
 export class SettingModel extends Model {
+  @Comment('key')
+  @Column(DataType.STRING)
+  key: string;
+
+  @Comment('value')
+  @Column(DataType.STRING)
+  value: string;
+
   @Comment('create time')
   @Column(DataType.DATE)
   gmt_create: Date;
