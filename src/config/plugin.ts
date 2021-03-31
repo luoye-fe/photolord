@@ -3,8 +3,8 @@ import { EggPlugin } from 'egg';
 export default {
   logrotator: false,
   static: true,
-  sequelize: {
+  cors: {
     enable: true,
-    package: 'egg-sequelize',
+    package: 'egg-cors',
   },
 } as EggPlugin;

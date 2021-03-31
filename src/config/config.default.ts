@@ -1,6 +1,5 @@
 import * as path from 'path';
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
-import { Sequelize } from 'sequelize-typescript';
 
 export type DefaultConfig = PowerPartial<EggAppConfig>;
 
@@ -15,10 +14,23 @@ export default (appInfo: EggAppInfo): DefaultConfig => {
     replaceEggLogger: true,      
   };
 
-  config.sequelize = {
-    dialect: 'sqlite',
-    storage: path.join(appInfo.baseDir, '../db/database.sqlite'),
-    Sequelize,
+  config.orm = {
+    type: 'sqlite',
+    database: path.join(appInfo.baseDir, '../db/database.sqlite'),
+    synchronize: true,
+    logging: true,
+  };
+
+  config.cors = {
+    origin: () => {
+      return '127.0.0.1:7001';
+    },
+    credentials: true,
+  };
+
+  config.security = {
+    domainWhiteList: [ 'http://127.0.0.1:7001' ],
+    csrf: false,
   };
 
   return config;

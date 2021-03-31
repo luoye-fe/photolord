@@ -1,11 +1,12 @@
 import { Context } from 'egg';
 import * as crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
-import { Op } from 'sequelize';
 import * as jwt from 'jsonwebtoken';
-import { Controller, Get, Provide, Inject } from '@midwayjs/decorator';
+import { Controller, Get, Provide } from '@midwayjs/decorator';
+import { InjectEntityModel } from '@midwayjs/orm';
+import { Repository } from 'typeorm';
 
-import { SettingModel } from '@/app/model/setting';
+import { SettingModel } from '@/entity/setting';
 import { DEFAULT_PASSWORD, DEFAULT_USER_NAME } from '@/const/token/index';
 import { IPlainObject } from '@/typings';
 
@@ -13,22 +14,22 @@ import { IPlainObject } from '@/typings';
 @Controller('/api/auth')
 export class ApiIndexController {
 
-  @Inject()
-  settingModel: typeof SettingModel;
+  @InjectEntityModel(SettingModel)
+  settingModel: Repository<SettingModel>;
 
   @Get('/login')
   async home(ctx: Context) {
     const { username, password } = ctx.query;
     if (!username || !password) return ctx.fail(400, ctx.errorCode.Params_Error);
 
-    const [usernameItem, passwordItem, passwordSaltItem] = await this.settingModel.findAll({
-      where: {
-        [Op.or]: [
-          { key: 'username' },
-          { key: 'password' },
-          { key: 'password_salt' },
-        ],
-      },
+    const [usernameItem, passwordItem, passwordSaltItem] = await this.settingModel.find({
+      where: [{
+        key: 'username',
+      }, {
+        key: 'password',
+      }, {
+        key: 'password_salt',
+      }],
     });
 
     if (usernameItem) {
@@ -49,17 +50,16 @@ export class ApiIndexController {
       if (username !== DEFAULT_USER_NAME) return ctx.fail(400, 'login fail');
 
       // default account password not match
-      if (password !== DEFAULT_PASSWORD)  return ctx.fail(400, 'login fail');
+      if (password !== DEFAULT_PASSWORD) return ctx.fail(400, 'login fail');
 
       // create default account
       const salt = uuidv4();
-      const now = new Date();
       const encryptedPassword = this.encryptPassword(DEFAULT_PASSWORD, salt);
-  
-      await this.settingModel.bulkCreate([
-        { key: 'username', value: DEFAULT_USER_NAME, gmt_create: now, gmt_modified: now },
-        { key: 'password', value: encryptedPassword, gmt_create: now, gmt_modified: now },
-        { key: 'password_salt', value: salt, gmt_create: now, gmt_modified: now },
+
+      await this.settingModel.save([
+        { key: 'username', value: DEFAULT_USER_NAME },
+        { key: 'password', value: encryptedPassword },
+        { key: 'password_salt', value: salt },
       ]);
 
       return ctx.success({

@@ -1,15 +1,17 @@
-import { Provide, Inject } from '@midwayjs/decorator';
+import { Provide } from '@midwayjs/decorator';
 import { IWebMiddleware, IMidwayWebNext } from '@midwayjs/web';
+import { InjectEntityModel } from '@midwayjs/orm';
 import { Context } from 'egg';
 import * as jwt from 'jsonwebtoken';
+import { Repository } from 'typeorm';
 
 import ErrorCode from '@/const/error-code/index';
-import { SettingModel } from '@/app/model/setting';
+import { SettingModel } from '@/entity/setting';
 
 @Provide()
 export class UserMiddleware implements IWebMiddleware {
-  @Inject()
-  settingModel: typeof SettingModel;
+  @InjectEntityModel(SettingModel)
+  settingModel: Repository<SettingModel>;
 
   resolve() {
     return async (ctx: Context, next: IMidwayWebNext) => {

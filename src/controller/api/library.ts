@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Provide, Inject } from '@midwayjs/decorator';
+import { Controller, Get, Post, Provide, Inject, Options } from '@midwayjs/decorator';
 import { Context } from 'egg';
+import * as fs from 'fs';
 
 import ApiLibraryService from '@/service/api/library';
 import { IResponse } from '@/typings';
@@ -33,9 +34,25 @@ export class ApiLibraryController {
     return ctx.success(this.formatLibraryResult(result));
   }
 
+  @Options('/create')
   @Post('/create')
-  async crate() {
-    return 'auth';
+  async crate(ctx: Context): Promise<IResponse> {
+    const { path, autoAnalyse = true, comment = '' } = ctx.request.body;
+    if (!path) return ctx.fail(400, ctx.errorCode.Params_Error);
+
+    const pathIsExists = fs.existsSync(path);
+    if (!pathIsExists) return ctx.fail(400, 'path not exists');
+
+    const libraryIsExists = await this.libraryService.queryByPath(path);
+    if (libraryIsExists) return ctx.fail(400, 'library has exits');
+
+    const result = await this.libraryService.create({
+      path,
+      auto_analyse: autoAnalyse ? 1 : 0,
+      comment,
+    });
+
+    ctx.success(result);
   }
 
   @Post('/update')
