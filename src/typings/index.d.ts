@@ -1,4 +1,4 @@
-import { Application } from 'egg';
+import { Agent, Application } from 'egg';
 import { StatusCodes } from 'http-status-codes';
 
 interface IPlainObject {
@@ -15,6 +15,7 @@ declare global {
   namespace NodeJS {
     interface Global {
       app: Application;
+      agent: Agent;
     }
   }
 }
