@@ -1,7 +1,17 @@
 import * as chokidar from 'chokidar';
 import { LibraryModel } from '@/entity/library';
 
-let watcher: chokidar.FSWatcher | null = null;
+interface ProcessFile {
+  action: 'add' | 'change' | 'unlink';
+  filePath: string;
+}
+
+interface WatcherItem extends LibraryModel{
+  watcher: chokidar.FSWatcher;
+  processFileList: ProcessFile[];
+}
+
+let watcherList: WatcherItem[] = [];
 
 const watchOptions: chokidar.WatchOptions = {
   persistent: true,
@@ -11,24 +21,40 @@ const watchOptions: chokidar.WatchOptions = {
 
 export function handleAllLibrary(list: LibraryModel[]) {
   const { logger } = global.agent;
-  
   logger.info('Library update, re-watch all library.');
+
+  const resultWatcherList = [];
+
   list.forEach(item => {
     const { path: libraryPath } = item;
-    if (!watcher) {
-      watcher = chokidar.watch(libraryPath, watchOptions);
 
-      watcher
-        .on('add', path => logger.info(`File ${path} has been added`))
-        .on('change', path => logger.info(`File ${path} has been changed`))
-        .on('unlink', path => logger.info(`File ${path} has been removed`));
+    const existWatcherItem = watcherList.find(i => i.path === libraryPath);
+    if (existWatcherItem) {
+      resultWatcherList.push(item);
+      return;
     }
 
-    const watchedPath = watcher.getWatched();
-    if (Object.keys(watchedPath).find(i => i === libraryPath)) return;
+    const watcher = chokidar.watch(libraryPath, watchOptions);
 
-    watcher.add(libraryPath);
+    watcher
+      .on('add', path => logger.info(`File ${path} has been added`))
+      .on('change', path => logger.info(`File ${path} has been changed`))
+      .on('unlink', path => logger.info(`File ${path} has been removed`));
+
+    resultWatcherList.push({
+      ...item,
+      watcher,
+      processFileList: [],
+    });
   });
 
-  logger.info(`Watched library list, ${list.map(i => i.path).join(' | ')}`);
+  // close watcher
+  watcherList.forEach(async (item) => {
+    if (list.find(i => i.path === item.path)) return;
+    await item.watcher.close();
+  });
+
+  watcherList = resultWatcherList;
+
+  logger.info(`Watched library list, ${watcherList.map(i => i.path).join(' | ')}`);
 }
