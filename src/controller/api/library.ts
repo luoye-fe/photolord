@@ -3,6 +3,7 @@ import { Context } from 'egg';
 import * as fs from 'fs';
 
 import ApiLibraryService from '@/service/api/library';
+import { publishLibraryUpdateMessage } from '@/ipc/index';
 import { IResponse } from '@/typings';
 
 @Provide()
@@ -51,6 +52,8 @@ export class ApiLibraryController {
       auto_analyse: autoAnalyse ? 1 : 0,
       comment,
     });
+
+    await publishLibraryUpdateMessage();
 
     ctx.success(result);
   }

@@ -8,6 +8,4 @@ import { Configuration } from '@midwayjs/decorator';
     '@midwayjs/orm',
   ],
 })
-export class ContainerConfiguration {
-
-}
+export class ContainerLifeCycle {}

@@ -1,3 +1,4 @@
+import { Application } from 'egg';
 import { StatusCodes } from 'http-status-codes';
 
 interface IPlainObject {
@@ -8,4 +9,12 @@ interface IResponse {
   code: StatusCodes;
   message: string;
   data: IPlainObject;
+}
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      app: Application;
+    }
+  }
 }

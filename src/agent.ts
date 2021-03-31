@@ -1,10 +1,11 @@
+import 'tsconfig-paths/register';
+
 import { Agent } from 'egg';
-export default class Boot  {
-  agent: Agent;
+import { IPC_APP_LIBRARY_UPDATE } from '@/ipc/channel';
+import { LibraryModel } from './entity/library';
 
-  constructor(agent: Agent) {
-    this.agent = agent;
-  }
-
-
-}
+export default (agent: Agent) => {
+  agent.messenger.on(IPC_APP_LIBRARY_UPDATE, (libraryList: LibraryModel[]) => {
+    console.log(libraryList);
+  });
+};
