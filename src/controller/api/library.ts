@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Provide, Inject, Options } from '@midwayjs/decorator';
 import { Context } from 'egg';
 import * as fs from 'fs';
+import * as pathModule from 'path';
 
 import ApiLibraryService from '@/service/api/library';
 import { publishLibraryUpdateMessage } from '@/ipc/index';
@@ -28,7 +29,9 @@ export class ApiLibraryController {
 
     if (!id) return ctx.fail(400, ctx.errorCode.Params_Error);
 
-    const result = await this.libraryService.query(Number(id));
+    const result = await this.libraryService.query({
+      id: Number(id),
+    });
 
     if (!result) return ctx.fail(400, 'library not found');
 
@@ -43,15 +46,30 @@ export class ApiLibraryController {
 
     const pathIsExists = fs.existsSync(path);
     if (!pathIsExists) return ctx.fail(400, 'path not exists');
+    if (!pathModule.isAbsolute(path)) return ctx.fail(400, 'library path must absolute path');
 
-    const libraryIsExists = await this.libraryService.queryByPath(path);
-    if (libraryIsExists) return ctx.fail(400, 'library has exits');
+    let result = null;
 
-    const result = await this.libraryService.create({
-      path,
-      auto_analyse: autoAnalyse ? 1 : 0,
-      comment,
-    });
+    const existedLibrary = await this.libraryService.query({ path });
+
+    if (existedLibrary) {
+      if (existedLibrary.delete_flag === 1) {
+        result = await this.libraryService.update(existedLibrary.id, {
+          comment,
+          auto_analyse: autoAnalyse ? 1 : 0,
+          analyse_ing: 0,
+          delete_flag: 0,
+        });
+      } else {
+        return ctx.fail(400, 'library has existed');
+      }
+    } else {
+      result = await this.libraryService.create({
+        path,
+        auto_analyse: autoAnalyse ? 1 : 0,
+        comment,
+      });
+    }
 
     await publishLibraryUpdateMessage();
 

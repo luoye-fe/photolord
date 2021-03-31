@@ -1,8 +1,9 @@
 import { Provide } from '@midwayjs/decorator';
 import { InjectEntityModel } from '@midwayjs/orm';
-import { Repository } from 'typeorm';
+import { FindConditions, Repository } from 'typeorm';
 
 import { LibraryModel } from '@/entity/library';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 @Provide()
 export default class ApiLibraryService {
@@ -10,21 +11,9 @@ export default class ApiLibraryService {
   @InjectEntityModel(LibraryModel)
   private libraryModel: Repository<LibraryModel>;
 
-  public async query(id: number) {
+  public async query(options: FindConditions<LibraryModel>) {
     const result = await this.libraryModel.findOne({
-      where: {
-        id,
-      },
-    });
-
-    return result;
-  }
-
-  public async queryByPath(path: string) {
-    const result = await this.libraryModel.findOne({
-      where: {
-        path,
-      },
+      where: options,
     });
 
     return result;
@@ -49,9 +38,8 @@ export default class ApiLibraryService {
     return await this.libraryModel.save(model);
   }
 
-  public async update(id: number, model: LibraryModel) {
-    await this.libraryModel.update({
-      id,
-    }, model);
+  public async update(id: number, model: QueryDeepPartialEntity<LibraryModel>) {
+    await this.libraryModel.update(id, model);
+    return this.libraryModel.findOne(id);
   }
 }
