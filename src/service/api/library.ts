@@ -40,6 +40,6 @@ export default class ApiLibraryService {
 
   public async update(id: number, model: QueryDeepPartialEntity<LibraryModel>) {
     await this.libraryModel.update(id, model);
-    return this.libraryModel.findOne(id);
+    return await this.libraryModel.findOne(id);
   }
 }
