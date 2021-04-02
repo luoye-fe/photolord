@@ -60,7 +60,7 @@ export class ApiLibraryController {
 
       if (isSubDir(path, item.path) && item.delete_flag === 0) return ctx.fail(400, 'this library is sub dir belongs to some library');
 
-      if (isSubDir(item.path, path) && item.delete_flag) return ctx.fail(400, 'this library is parent dir belongs to some library');
+      if (isSubDir(item.path, path) && item.delete_flag === 0) return ctx.fail(400, 'this library is parent dir belongs to some library');
 
       if (item.delete_flag === 1) {
         result = await this.libraryService.update(item.id, {
