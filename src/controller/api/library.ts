@@ -42,7 +42,7 @@ export class ApiLibraryController {
   @Options('/create')
   @Post('/create')
   async crate(ctx: Context): Promise<IResponse> {
-    const { path, autoAnalyse = true, comment = '' } = ctx.request.body;
+    const { path, comment = '' } = ctx.request.body;
     if (!path) return ctx.fail(400, ctx.errorCode.Params_Error);
 
     const pathIsExists = fs.existsSync(path);
@@ -65,7 +65,6 @@ export class ApiLibraryController {
       if (item.delete_flag === 1) {
         result = await this.libraryService.update(item.id, {
           comment,
-          auto_analyse: autoAnalyse ? 1 : 0,
           analyse_ing: 0,
           delete_flag: 0,
         });
@@ -78,7 +77,6 @@ export class ApiLibraryController {
 
     result = await this.libraryService.create({
       path,
-      auto_analyse: autoAnalyse ? 1 : 0,
       comment,
     });
 

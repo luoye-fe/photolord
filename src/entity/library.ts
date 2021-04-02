@@ -24,12 +24,6 @@ export class LibraryModel {
   comment?: string;
 
   @Column('integer', {
-    default: 1,
-    comment: 'watch library all change',
-  })
-  auto_analyse?: number;
-
-  @Column('integer', {
     default: 0,
     comment: 'library analyse status',
   })
