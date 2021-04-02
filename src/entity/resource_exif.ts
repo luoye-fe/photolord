@@ -2,7 +2,7 @@ import { EntityModel } from '@midwayjs/orm';
 import { Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @EntityModel({
-  name: 'resource',
+  name: 'resource_exit',
 })
 export class ResourceModel {
   @PrimaryGeneratedColumn()
@@ -13,16 +13,16 @@ export class ResourceModel {
   })
   md5: string;
 
+  @Column('varchar', {
+    comment: 'image exif tag name',
+  })
+  key: string;
+
   @Column('text', {
-    comment: 'file relative path',
+    comment: 'image exif tag value',
   })
-  path: string;
-
-  @Column('integer', {
-    comment: 'the id of owned library',
-  })
-  library_id: number;
-
+  value: string;
+  
   @Column('datetime', {
     default: () => Date.now(),
     comment: 'create time',
