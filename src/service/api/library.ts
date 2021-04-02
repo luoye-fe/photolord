@@ -19,6 +19,10 @@ export default class ApiLibraryService {
     return result;
   }
 
+  public async queryAll() {
+    return await this.libraryModel.find();
+  }
+
   public async batchQuery(page = 1, size = 10) {
     const result = await this.libraryModel.find({
       where: {

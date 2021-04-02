@@ -6,6 +6,7 @@ import * as pathModule from 'path';
 import ApiLibraryService from '@/service/api/library';
 import { publishLibraryUpdateMessage } from '@/ipc/index';
 import { IResponse } from '@/typings';
+import { isSubDir } from '@/utils/index';
 
 @Provide()
 @Controller('/api/library', {
@@ -50,29 +51,38 @@ export class ApiLibraryController {
 
     let result = null;
 
-    const existedLibrary = await this.libraryService.query({ path });
+    const allLibraries = await this.libraryService.queryAll();
 
-    if (existedLibrary) {
-      if (existedLibrary.delete_flag === 1) {
-        result = await this.libraryService.update(existedLibrary.id, {
+    for(let i = 0; i < allLibraries.length; i++) {
+      const item = allLibraries[i];
+
+      if (path === item.path && item.delete_flag === 0) return ctx.fail(400, 'library has existed');
+
+      if (isSubDir(path, item.path) && item.delete_flag === 0) return ctx.fail(400, 'this library is sub dir belongs to some library');
+
+      if (isSubDir(item.path, path) && item.delete_flag) return ctx.fail(400, 'this library is parent dir belongs to some library');
+
+      if (item.delete_flag === 1) {
+        result = await this.libraryService.update(item.id, {
           comment,
           auto_analyse: autoAnalyse ? 1 : 0,
           analyse_ing: 0,
           delete_flag: 0,
         });
-      } else {
-        return ctx.fail(400, 'library has existed');
+
+        await publishLibraryUpdateMessage();
+        ctx.success(result);
+        return;
       }
-    } else {
-      result = await this.libraryService.create({
-        path,
-        auto_analyse: autoAnalyse ? 1 : 0,
-        comment,
-      });
     }
 
-    await publishLibraryUpdateMessage();
+    result = await this.libraryService.create({
+      path,
+      auto_analyse: autoAnalyse ? 1 : 0,
+      comment,
+    });
 
+    await publishLibraryUpdateMessage();
     ctx.success(result);
   }
 
