@@ -3,7 +3,7 @@ import { LibraryModel } from '@/entity/library';
 import { IPC_APP_LIBRARY_UPDATE } from '@/ipc/channel';
 
 /**
- * when app launch or library update, publish message to agent with all library
+ * when app launch or library update (create & delete), publish message to agent with all library
  * @param app
  */
 export async function publishLibraryUpdateMessage() {
