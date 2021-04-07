@@ -11,6 +11,10 @@ interface IResponse {
   data: IPlainObject;
 }
 
+interface IResourceInfo {
+  exif: IPlainObject;
+}
+
 declare global {
   namespace NodeJS {
     interface Global {

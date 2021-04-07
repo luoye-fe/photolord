@@ -9,3 +9,6 @@ Such as object recognition, face recognition, location mark, artificial label, t
 ## web ui 
 
 http://localhost:7001/public/index.html
+
+
+https://git.lywos.com/yytol/php-mediawiki/blob/master/wiki/languages/i18n/exif/zh-hans.json
