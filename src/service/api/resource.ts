@@ -1,23 +1,23 @@
 import * as path from 'path';
-import { Inject, Provide } from '@midwayjs/decorator';
+import { Provide } from '@midwayjs/decorator';
 import { InjectEntityModel } from '@midwayjs/orm';
 import { getConnection, Repository } from 'typeorm';
 
+import { LibraryModel } from '@/entity/library';
 import { ResourceModel } from '@/entity/resource';
 import { ResourceExifModel } from '@/entity/resource_exif';
 import { IPlainObject, IResourceActionResult } from '@/typings';
-import ApiLibraryService from '@/service/api/library';
 
 @Provide()
 export default class ApiResourceService {
+  @InjectEntityModel(LibraryModel)
+  private libraryModel: Repository<LibraryModel>;
+
   @InjectEntityModel(ResourceModel)
   private resourceModel: Repository<ResourceModel>;
 
   @InjectEntityModel(ResourceExifModel)
   private resourceExifModel: Repository<ResourceExifModel>;
-
-  @Inject()
-  libraryService: ApiLibraryService;
 
   private processFileList: IResourceActionResult[] = [];
   private processIng = false;
@@ -36,7 +36,7 @@ export default class ApiResourceService {
 
       const { action, libraryId, fileInfo, filePath } = target;
 
-      const { path: libraryPath } = await this.libraryService.query({
+      const { path: libraryPath } = await this.libraryModel.findOne({
         id: libraryId,
       });
 

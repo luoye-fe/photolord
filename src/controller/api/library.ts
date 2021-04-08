@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Provide, Inject, Options } from '@midwayjs/decorator';
+import { Controller, Get, Post, Provide, Options } from '@midwayjs/decorator';
 import { Context } from 'egg';
 import * as fs from 'fs';
 import * as pathModule from 'path';
 
-import ApiLibraryService from '@/service/api/library';
 import { publishLibraryUpdateMessage } from '@/ipc/index';
 import { IResponse } from '@/typings';
 import { isSubDir } from '@/utils/index';
+import { LibraryModel } from '@/entity/library';
+import { Repository } from 'typeorm';
+import { InjectEntityModel } from '@midwayjs/orm';
 
 @Provide()
 @Controller('/api/library', {
@@ -15,22 +17,34 @@ import { isSubDir } from '@/utils/index';
   ],
 })
 export class ApiLibraryController {
-
-  @Inject()
-  libraryService: ApiLibraryService;
+  @InjectEntityModel(LibraryModel)
+  private libraryModel: Repository<LibraryModel>;
 
   @Get('/list')
-  async list() {
-    return 'auth';
+  async list(ctx: Context) {
+    const { page = 1, size = 10 } = ctx.query;
+
+    const result = await this.libraryModel.find({
+      take: Number(size),
+      skip: (Number(page) - 1) * Number(size),
+      order: {
+        gmt_create: 'DESC',
+      },
+    });
+
+    return ctx.success({
+      page,
+      size,
+      list: result.map(this.formatLibraryResult),
+    });
   }
 
   @Get('/detail')
   async detail(ctx: Context): Promise<IResponse> {
     const { id } = ctx.query;
-
     if (!id) return ctx.fail(400, ctx.errorCode.Params_Error);
 
-    const result = await this.libraryService.query({
+    const result = await this.libraryModel.findOne({
       id: Number(id),
     });
 
@@ -49,9 +63,9 @@ export class ApiLibraryController {
     if (!pathIsExists) return ctx.fail(400, 'path not exists');
     if (!pathModule.isAbsolute(path)) return ctx.fail(400, 'library path must absolute path');
 
-    const allLibraries = await this.libraryService.queryAll();
+    const allLibraries = await this.libraryModel.find();
 
-    for(let i = 0; i < allLibraries.length; i++) {
+    for (let i = 0; i < allLibraries.length; i++) {
       const item = allLibraries[i];
 
       if (path === item.path) return ctx.fail(400, 'library has existed');
@@ -61,7 +75,7 @@ export class ApiLibraryController {
       if (isSubDir(item.path, path)) return ctx.fail(400, 'this library is parent dir belongs to some library');
     }
 
-    const result = await this.libraryService.create({
+    const result = await this.libraryModel.save({
       path,
       comment,
     });
@@ -70,14 +84,18 @@ export class ApiLibraryController {
     ctx.success(result);
   }
 
-  @Post('/update')
-  async update() {
-    return 'auth';
-  }
-
   @Post('/delete')
-  async delete() {
-    return 'auth';
+  async delete(ctx: Context) {
+    const { id } = ctx.request.body;
+    if (!id) return ctx.fail(400, ctx.errorCode.Params_Error);
+
+    await this.libraryModel.delete({
+      id: Number(id),
+    });
+
+    ctx.success({
+      id,
+    });
   }
 
   private formatLibraryResult(source) {
