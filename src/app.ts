@@ -3,6 +3,7 @@ import { IBoot } from 'midway';
 
 import { publishLibraryUpdateMessage } from '@/ipc/index';
 import { IPC_AGENT_LIBRARY_UPDATE, IPC_AGENT_RESOURCE_UPDATE } from '@/ipc/channel';
+import { IResourceActionResult } from './typings';
 
 export default class Boot implements IBoot {
   app: Application;
@@ -25,7 +26,7 @@ export default class Boot implements IBoot {
     });
 
     // listen resource result from agent, update to database
-    this.app.messenger.on(IPC_AGENT_RESOURCE_UPDATE, (result) => {
+    this.app.messenger.on(IPC_AGENT_RESOURCE_UPDATE, (result: IResourceActionResult) => {
       console.log(result);
     });
   }

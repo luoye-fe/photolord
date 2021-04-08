@@ -24,6 +24,14 @@ interface IResourceInfo {
   exif: IPlainObject;
 }
 
+interface IResourceActionResult {
+  action: 'add' | 'unlink';
+  libraryId: string;
+  filePath: string;
+  fileInfo: IResourceInfo;
+}
+
+
 declare global {
   namespace NodeJS {
     interface Global {

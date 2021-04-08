@@ -3,8 +3,9 @@ import 'tsconfig-paths/register';
 import { Agent } from 'egg';
 import * as chokidar from 'chokidar';
 
-import { IPC_APP_LIBRARY_UPDATE } from '@/ipc/channel';
+import { IPC_APP_LIBRARY_UPDATE, IPC_AGENT_RESOURCE_UPDATE } from '@/ipc/channel';
 import { LibraryModel } from '@/entity/library';
+import { isImage, analyzeFile } from '@/utils/resource';
 
 interface ProcessFile {
   action: 'add' | 'change' | 'unlink';
@@ -18,6 +19,7 @@ interface WatcherItem extends LibraryModel {
 
 const watchOptions: chokidar.WatchOptions = {
   persistent: true,
+  awaitWriteFinish: true,
   ignoreInitial: true,
   ignored: /(^|[\/\\])\../, // ignore hidden file
 };
@@ -29,36 +31,39 @@ function listenFileChange() {
   if (processing) return;
   processing = true;
 
-  function handleOneFile() {
+  async function handleOneFile() {
     const target = processFileList[0];
     if (!target) {
       processing = false;
       return;
     }
 
-    // analyze file -> exif object face ...
-    console.log('正在处理');
-    console.log(target);
+    const { action, libraryId, filePath } = target;
+    global.agent.logger.info(`Library [${libraryId}] file [${action}]: ${filePath}`);
 
-    setTimeout(() => {
-      console.log('处理完毕\n');
-      processFileList.shift();
-      handleOneFile();
-    }, 3000);
+    let fileInfo = null;
+    if (action === 'add') {
+      const start = Date.now();
+      global.agent.logger.info(`Analyze file start: ${filePath}`);
+      fileInfo = await analyzeFile(filePath);
+      global.agent.logger.info(`Analyze file end [${Date.now() - start}ms]: ${filePath}`);
+    }
+
+    global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
+      action,
+      libraryId,
+      filePath,
+      fileInfo,
+    });
+
+    processFileList.shift();
+    handleOneFile();
   }
 
   handleOneFile();
 }
 
-const processFileList: ProcessFile[] = new Proxy([], {
-  set(obj, key, val) {
-    Reflect.set(obj, key, val);
-    if (key !== 'length') listenFileChange();
-    return true;
-  },
-});
-
-
+const processFileList: ProcessFile[] = [];
 function handleAllLibrary(libraryList: LibraryModel[]) {
   libraryList.forEach(item => {
     const { path: libraryPath, id } = item;
@@ -69,9 +74,18 @@ function handleAllLibrary(libraryList: LibraryModel[]) {
     const watcher = chokidar.watch(libraryPath, watchOptions);
 
     watcher
-      .on('add', path => processFileList.push({ action: 'add', libraryId: id, filePath: path }))
-      .on('change', path => processFileList.push({ action: 'change', libraryId: id, filePath: path }))
-      .on('unlink', path => processFileList.push({ action: 'unlink', libraryId: id, filePath: path }));
+      .on('add', path => {
+        if (isImage(path)) {
+          processFileList.push({ action: 'add', libraryId: id, filePath: path });
+          listenFileChange();
+        }
+      })
+      .on('unlink', path => {
+        if (isImage(path)) {
+          processFileList.push({ action: 'unlink', libraryId: id, filePath: path });
+          listenFileChange();
+        }
+      });
 
     watcherList.set(libraryPath, {
       ...item,

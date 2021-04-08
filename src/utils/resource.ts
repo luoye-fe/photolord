@@ -9,10 +9,6 @@ import { md5Buffer } from '@/utils/index';
 import { IMAGE_EXTENSIONS } from '@/const/token/image';
 import { IPlainObject, IResourceInfo } from '@/typings';
 
-function isImage(filePath: string) {
-  return IMAGE_EXTENSIONS.find(i => i === path.extname(filePath).slice(1).toLowerCase());
-}
-
 function formatExif(exif: IPlainObject) {
   const result = {};
 
@@ -41,6 +37,10 @@ function formatExif(exif: IPlainObject) {
   }
 
   return result;
+}
+
+export function isImage(filePath: string) {
+  return IMAGE_EXTENSIONS.find(i => i === path.extname(filePath).slice(1).toLowerCase());
 }
 
 export async function analyzeFile(filePath: string): Promise<IResourceInfo> {
