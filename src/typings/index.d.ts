@@ -26,7 +26,7 @@ interface IResourceInfo {
 
 interface IResourceActionResult {
   action: 'add' | 'unlink';
-  libraryId: string;
+  libraryId: number;
   filePath: string;
   fileInfo: IResourceInfo;
 }
@@ -37,6 +37,7 @@ declare global {
     interface Global {
       app: Application;
       agent: Agent;
+      eventInstance: EventEmitter;
     }
   }
 }

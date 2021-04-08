@@ -18,6 +18,41 @@ export class ResourceModel {
   })
   path: string;
 
+  @Column('varchar', {
+    comment: 'file name',
+  })
+  name: string;
+
+  @Column('varchar', {
+    comment: 'image format, JPEG | PNG | ...',
+  })
+  format: string;
+
+  @Column('integer', {
+    comment: 'image width',
+  })
+  width: number;
+
+  @Column('integer', {
+    comment: 'image height',
+  })
+  height: number;
+
+  @Column('integer', {
+    comment: 'file size B',
+  })
+  size: number;
+
+  @Column('datetime', {
+    comment: 'file create date',
+  })
+  create_date: Date;
+
+  @Column('datetime', {
+    comment: 'file modify date',
+  })
+  modify_date: Date;
+
   @Column('integer', {
     comment: 'the id of owned library',
   })

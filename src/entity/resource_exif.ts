@@ -4,7 +4,7 @@ import { Column, PrimaryGeneratedColumn } from 'typeorm';
 @EntityModel({
   name: 'resource_exit',
 })
-export class ResourceModel {
+export class ResourceExifModel {
   @PrimaryGeneratedColumn()
   id?: number;
 
