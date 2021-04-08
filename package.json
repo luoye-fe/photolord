@@ -25,7 +25,7 @@
     "egg": "^2.29.3",
     "egg-cors": "^2.2.3",
     "egg-scripts": "^2.13.0",
-    "exif-reader": "^1.0.3",
+    "exifr": "^6.2.0",
     "fs-extra": "^9.1.0",
     "http-status-codes": "^2.1.4",
     "jsonwebtoken": "^8.5.1",

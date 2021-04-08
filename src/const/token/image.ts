@@ -5,7 +5,6 @@ export const IMAGE_EXTENSIONS = [
   'png',
   'webp',
   'avif',
-  'svg',
   'tiff',
   'heic',
   'heif',

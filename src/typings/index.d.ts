@@ -12,6 +12,15 @@ interface IResponse {
 }
 
 interface IResourceInfo {
+  md5: string;
+  path: string;
+  name: string;
+  format: string;
+  width: number;
+  height: number;
+  size: number;
+  createDate: Date;
+  modifyDate: Date;
   exif: IPlainObject;
 }
 
