@@ -43,7 +43,7 @@ export default class ApiResourceService {
       const resourceRelativePath = path.relative(libraryPath, filePath);
 
       if (action === 'add') {
-        await this.create({
+        await this.resourceModel.save({
           md5: fileInfo.md5,
           path: resourceRelativePath,
           library_id: libraryId,
@@ -89,10 +89,6 @@ export default class ApiResourceService {
       .values(exifList)
       .orIgnore()
       .execute();
-  }
-
-  public async create(model: ResourceModel) {
-    return await this.resourceModel.save(model);
   }
 
   public async remove(libraryId: number, path: string) {
