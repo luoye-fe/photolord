@@ -21,6 +21,26 @@ export class ApiResourceController {
   @InjectEntityModel(ResourceModel)
   resourceModel: Repository<ResourceModel>;
 
+  @Get('/list')
+  async list(ctx: Context) {
+    const { page = '1', size = '10', libraryId } = ctx.query;
+    if (!libraryId) return ctx.fail(400, ctx.errorCode.Params_Error);
+
+    const result = await this.resourceModel.find({
+      take: Number(size),
+      skip: (Number(page) - 1) * Number(size),
+      order: {
+        gmt_create: 'DESC',
+      },
+    });
+
+    ctx.success({
+      page,
+      size,
+      list: result,
+    });
+  }
+
   @Get('/transcode')
   async transcode(ctx: Context) {
     const { md5, width, height } = ctx.query;
