@@ -25,9 +25,6 @@ export default class ApiLibraryService {
 
   public async batchQuery(page = 1, size = 10) {
     const result = await this.libraryModel.find({
-      where: {
-        delete_flag: 0,
-      },
       take: size,
       skip: (page - 1) * size,
       order: {

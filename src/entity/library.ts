@@ -29,12 +29,6 @@ export class LibraryModel {
   })
   analyse_ing?: number;
 
-  @Column('integer', {
-    default: 0,
-    comment: 'delete flag',
-  })
-  delete_flag?: number;
-
   @Column('datetime', {
     default: () => Date.now(),
     comment: 'create time',

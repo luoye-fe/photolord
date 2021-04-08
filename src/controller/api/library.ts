@@ -49,33 +49,19 @@ export class ApiLibraryController {
     if (!pathIsExists) return ctx.fail(400, 'path not exists');
     if (!pathModule.isAbsolute(path)) return ctx.fail(400, 'library path must absolute path');
 
-    let result = null;
-
     const allLibraries = await this.libraryService.queryAll();
 
     for(let i = 0; i < allLibraries.length; i++) {
       const item = allLibraries[i];
 
-      if (path === item.path && item.delete_flag === 0) return ctx.fail(400, 'library has existed');
+      if (path === item.path) return ctx.fail(400, 'library has existed');
 
-      if (isSubDir(path, item.path) && item.delete_flag === 0) return ctx.fail(400, 'this library is sub dir belongs to some library');
+      if (isSubDir(path, item.path)) return ctx.fail(400, 'this library is sub dir belongs to some library');
 
-      if (isSubDir(item.path, path) && item.delete_flag === 0) return ctx.fail(400, 'this library is parent dir belongs to some library');
-
-      if (item.delete_flag === 1) {
-        result = await this.libraryService.update(item.id, {
-          comment,
-          analyse_ing: 0,
-          delete_flag: 0,
-        });
-
-        await publishLibraryUpdateMessage();
-        ctx.success(result);
-        return;
-      }
+      if (isSubDir(item.path, path)) return ctx.fail(400, 'this library is parent dir belongs to some library');
     }
 
-    result = await this.libraryService.create({
+    const result = await this.libraryService.create({
       path,
       comment,
     });
