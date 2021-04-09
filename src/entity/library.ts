@@ -1,6 +1,6 @@
 
 import { EntityModel } from '@midwayjs/orm';
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @EntityModel({
   name: 'library',
@@ -9,6 +9,7 @@ export class LibraryModel {
   @PrimaryGeneratedColumn({
     type: 'int',
   })
+  @Index()
   id?: number;
 
   @Column('text', {

@@ -1,11 +1,14 @@
 import { EntityModel } from '@midwayjs/orm';
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Index, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @EntityModel({
-  name: 'resource_exit',
+  name: 'resource_exif',
 })
+@Index(['md5', 'key'], { unique: true })
+@Unique('constraint_md5_key', ['md5', 'key'])
 export class ResourceExifModel {
   @PrimaryGeneratedColumn()
+  @Index()
   id?: number;
 
   @Column('varchar', {

@@ -1,11 +1,13 @@
 import { EntityModel } from '@midwayjs/orm';
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @EntityModel({
   name: 'resource',
 })
+@Index(['md5', 'path', 'library_id'], { unique: true })
 export class ResourceModel {
   @PrimaryGeneratedColumn()
+  @Index()
   id?: number;
 
   @Column('varchar', {

@@ -1,16 +1,18 @@
 import { EntityModel } from '@midwayjs/orm';
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @EntityModel({
   name: 'setting',
 })
 export class SettingModel {
   @PrimaryGeneratedColumn()
+  @Index()
   id: number;
 
   @Column('varchar', {
     comment: 'key',
   })
+  @Index()
   key: string;
 
   @Column('varchar', {
