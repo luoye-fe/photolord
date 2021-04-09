@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { Provide } from '@midwayjs/decorator';
 import { InjectEntityModel } from '@midwayjs/orm';
-import { getConnection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { LibraryModel } from '@/entity/library';
 import { ResourceModel } from '@/entity/resource';
@@ -21,7 +21,6 @@ export default class ApiResourceService {
 
   private processFileList: IResourceActionResult[] = [];
   private processIng = false;
-  private connection = getConnection('default');
 
   private queueHandleFile() {
     if (this.processIng) return;
@@ -81,31 +80,29 @@ export default class ApiResourceService {
       gmt_modified: new Date(),
     }));
 
-    return await this
-      .connection
-      .createQueryBuilder()
-      .insert()
-      .into(ResourceExifModel)
-      .values(exifList)
-      .orIgnore()
-      .execute();
+    try {
+      return await this.resourceExifModel
+        .createQueryBuilder()
+        .insert()
+        .into(ResourceExifModel)
+        .values(exifList)
+        .execute();
+    } catch(e) {} // eat all conflict error
   }
 
   public async remove(libraryId: number, path: string) {
-    const { md5 } = await this.resourceModel.findOne({
+    const resourceDetail = await this.resourceModel.findOne({
       library_id: libraryId,
       path,
     });
 
-    const sameMd5ResourceCount = await this.resourceModel.count({
-      md5,
-    });
-
-    // same md5 resource only one, remove all resource exif
-    if (sameMd5ResourceCount === 1) {
-      await this.resourceExifModel.delete({
-        md5,
+    if (resourceDetail) {
+      const sameMd5ResourceCount = await this.resourceModel.count({
+        md5: resourceDetail.md5,
       });
+  
+      // same md5 resource only one, remove all resource exif
+      if (sameMd5ResourceCount === 1) await this.resourceExifModel.delete({ md5: resourceDetail.md5 });
     }
 
     return await this.resourceModel.delete({
