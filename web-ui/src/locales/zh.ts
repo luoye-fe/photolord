@@ -1,5 +1,3 @@
-export default null;
-
 export const exifInfo = {
   'imagewidth': '宽度',
   'imagelength': '高度',
@@ -178,4 +176,8 @@ export const exifInfo = {
   'personinimage': '描绘的人物',
   'originalimageheight': '裁剪前的图像高度',
   'originalimagewidth': '裁剪前的图像宽度',
+};
+
+export default {
+  exifInfo,
 };

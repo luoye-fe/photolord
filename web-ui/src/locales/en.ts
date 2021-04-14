@@ -1,5 +1,3 @@
-export default null;
-
 export const exifInfo = {
   'imagewidth': 'Width',
   'imagelength': 'Height',
@@ -178,4 +176,8 @@ export const exifInfo = {
   'personinimage': 'Person depicted',
   'originalimageheight': 'Height of image before it was cropped',
   'originalimagewidth': 'Width of image before it was cropped',
+};
+
+export default {
+  exifInfo,
 };
