@@ -14,7 +14,7 @@ interface IResponse {
 }
 
 function gotoLoginPage() {
-  message.info('未登录');
+  message.error('Not Login');
 
   setTimeout(() => {
     history.push('/login');
