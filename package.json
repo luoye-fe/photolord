@@ -7,7 +7,7 @@
     "start": "npm run build && egg-scripts start --daemon --title=photolord --framework=@midwayjs/web",
     "stop": "egg-scripts stop --title=photolord",
     "dev": "cross-env ets && cross-env NODE_ENV=local midway-bin dev --ts",
-    "dev-ui": "cd web-ui && icejs start",
+    "dev-ui": "cd web-ui && icejs start --mode local",
     "test": "midway-bin test --ts",
     "build": "bash ./scripts/build.sh",
     "check": "luckyeye",
