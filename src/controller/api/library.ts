@@ -22,7 +22,7 @@ export class ApiLibraryController {
 
   @Get('/list')
   async list(ctx: Context) {
-    const { page = 1, size = 10 } = ctx.query;
+    const { page = '1', size = '10' } = ctx.query;
 
     const result = await this.libraryModel.find({
       take: Number(size),
@@ -96,6 +96,37 @@ export class ApiLibraryController {
     ctx.success({
       id,
     });
+  }
+
+  @Post('/scan')
+  async scan(ctx: Context) {
+    const { id } = ctx.request.body;
+    if (!id) return ctx.fail(400, ctx.errorCode.Params_Error);
+
+    const result = await this.libraryModel.findOne({
+      id: Number(id),
+    });
+
+    if (result.analyse_ing === 1) return ctx.success({
+      process: true,
+      message: 'analyze ing',
+    });
+
+    // scan message
+    // xxxx
+
+    // update status
+    await this.libraryModel.update(id, {
+      analyse_ing: 1,
+    });
+
+    ctx.success({
+      process: true,
+      message: 'analyze ing',
+    });
+
+    // begin analyze library
+
   }
 
   private formatLibraryResult(source) {

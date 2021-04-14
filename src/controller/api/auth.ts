@@ -12,7 +12,7 @@ import { IPlainObject } from '@/typings';
 
 @Provide()
 @Controller('/api/auth')
-export class ApiIndexController {
+export class ApiAuthController {
 
   @InjectEntityModel(SettingModel)
   settingModel: Repository<SettingModel>;
