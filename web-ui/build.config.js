@@ -5,7 +5,7 @@ module.exports = {
   plugins: [
     ['build-plugin-antd', {
       themeConfig: {
-        
+        'primary-color': '#e9a049',
       },
       importOptions: {
         libraryDirectory: 'es',
