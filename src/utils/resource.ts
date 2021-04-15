@@ -15,7 +15,7 @@ function formatExif(exif: IPlainObject) {
   for (const key in exif) {
     if (Object.prototype.hasOwnProperty.call(exif, key)) {
       const originVal = exif[key];
-      const resultKey = key.toLocaleLowerCase();
+      const resultKey = key;
 
       // special exif format value: Uint8Array | number | Date | array
       if (ArrayBuffer.isView(originVal)) {
@@ -23,13 +23,13 @@ function formatExif(exif: IPlainObject) {
         for (const byte of originVal as Uint8Array) {
           current.push(byte);
         }
-        result[resultKey] = current.join(',');
+        result[resultKey] = current.join(','); // TODO: parse it
       } else if (typeof originVal === 'number') {
         result[resultKey] = originVal.toString();
       } else if (Object.prototype.toString.call(originVal) === '[object Date]') {
         result[resultKey] = originVal.getTime().toString();
       } else if (Array.isArray(originVal)) {
-        result[resultKey] = originVal.join(',');
+        result[resultKey] = originVal.join(','); // TODO: parse it
       } else {
         result[resultKey] = originVal;
       }
@@ -51,7 +51,14 @@ export async function analyzeFile(filePath: string): Promise<IResourceInfo> {
   const metaData = await sharp(filePath).metadata();
 
   const fileBufferData = fse.readFileSync(filePath);
-  const exifInfo = await exifr.parse(fileBufferData);
+
+  let exifInfo = null;
+  try {
+    exifInfo = await exifr.parse(fileBufferData);
+  } catch (e) {
+    global.agent.logger.info('get resource exif error, does not affect the main process.');
+    global.agent.logger.error(e);
+  }
   const md5 = md5Buffer(fileBufferData);
   const stat = fse.statSync(filePath);
 

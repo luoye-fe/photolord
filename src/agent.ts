@@ -41,20 +41,32 @@ function listenFileChange() {
     const { action, libraryId, filePath } = target;
     global.agent.logger.info(`Library [${libraryId}] file [${action}]: ${filePath}`);
 
-    let fileInfo = null;
     if (action === 'add') {
       const start = Date.now();
       global.agent.logger.info(`Analyze file start: ${filePath}`);
-      fileInfo = await analyzeFile(filePath);
-      global.agent.logger.info(`Analyze file end [${Date.now() - start}ms]: ${filePath}`);
+      try {
+        const fileInfo = await analyzeFile(filePath);
+        global.agent.logger.info(`Analyze file success [${Date.now() - start}ms]: ${filePath}`);
+        global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
+          action,
+          libraryId,
+          filePath,
+          fileInfo,
+        });
+      } catch (e) {
+        global.agent.logger.info(`Analyze file error [${Date.now() - start}ms]: ${filePath}`);
+        global.agent.logger.error(e);
+      }
     }
 
-    global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
-      action,
-      libraryId,
-      filePath,
-      fileInfo,
-    });
+    if (action === 'unlink') {
+      global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
+        action,
+        libraryId,
+        filePath,
+        fileInfo: null,
+      });
+    }
 
     processFileList.shift();
     handleOneFile();
