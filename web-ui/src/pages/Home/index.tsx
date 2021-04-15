@@ -3,7 +3,7 @@ import { Spin } from 'antd';
 import fetch from '@/common/fetch';
 
 import TitleBar from './components/TitleBar';
-import ActionBar from './components/ActionBar';
+import ActionBar, { BreadcrumbConfig } from './components/ActionBar';
 
 import LibraryTab from './components/LibraryTab';
 import TimelineTab from './components/TimelineTab';
@@ -16,9 +16,19 @@ const TAB_LIST = ['library', 'timeline', 'search'];
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [photoCount, setPhotoCount] = useState(0);
+  const [breadcrumbConfig, setBreadcrumbConfig] = useState<BreadcrumbConfig[]>([]);
 
   function handleActiveTabIndexChange(index: number) {
     setActiveTabIndex(index);
+  }
+
+  function handlePhotoCountChange(count: number) {
+    setPhotoCount(count);
+  }
+
+  function handleBreadcrumbChange(breadcrumbConfig: BreadcrumbConfig[]) {
+    setBreadcrumbConfig(breadcrumbConfig);
   }
 
   useEffect(() => {
@@ -45,10 +55,15 @@ export default function Home() {
           activeTabIndex={activeTabIndex}
           onActiveTabIndexChange={handleActiveTabIndexChange}
         />
-        <ActionBar />
+        <ActionBar
+          photoCount={photoCount}
+          breadcrumb={breadcrumbConfig}
+        />
         <div className={styles.main}>
           {activeTabIndex === 0 && <LibraryTab />}
-          {activeTabIndex === 1 && <TimelineTab />}
+          {activeTabIndex === 1 && <TimelineTab
+            onBreadcrumbChange={handleBreadcrumbChange}
+            onPhotoCountChange={handlePhotoCountChange} />}
           {activeTabIndex === 2 && <SearchTab />}
         </div>
       </div>

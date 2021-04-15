@@ -11,13 +11,13 @@ interface PropsType {
   onActiveTabIndexChange: (index: number) => void;
 }
 
-const TitleBar = (options: PropsType) => {
+const TitleBar = (props: PropsType) => {
   const {
     tabList = [],
     activeTabIndex,
     onActiveTabIndexChange,
     disableTabClick = false,
-  } = options;
+  } = props;
 
   function handleActionItemClick(index: number) {
     if (disableTabClick) return;
@@ -31,7 +31,7 @@ const TitleBar = (options: PropsType) => {
       </div>
       <ul className={styles['action-list']}>
         {tabList.map((tab, tabIndex) => (
-          <li onClick={() => handleActionItemClick(tabIndex)} className={classnames({
+          <li key={tab} onClick={() => handleActionItemClick(tabIndex)} className={classnames({
             [styles['action-item']]: true,
             [styles['action-item-active']]: tabIndex === activeTabIndex,
           })}>{tab}</li>  
