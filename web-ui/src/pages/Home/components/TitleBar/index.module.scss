@@ -1,0 +1,90 @@
+.container {
+  height: 50px;
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 0 40px;
+  box-sizing: border-box;
+  box-shadow: 0 3px 6px 0 rgb(0 0 0 / 15%);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+}
+
+.title-text {
+  color: hsla(0, 0%, 100%, 0.75);
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  cursor: default;
+  font-weight: bold;
+}
+
+.action-list {
+  flex: 1;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-item {
+  box-sizing: border-box;
+  outline: none;
+  border: 0;
+  background: none;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin: 0 5px;
+  max-width: 250px;
+  min-width: 0;
+  padding: 5px 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: transparent;
+  color: hsla(0, 0%, 100%, 0.45);
+  font-size: 16px;
+  line-height: 30px;
+  transition: background-color 0.2s, color 0.2s;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.action-item:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.action-item-active {
+  color: #e9a049;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.action-icon {
+  display: flex;
+  align-items: center;
+}
+
+.action-icon-item {
+  color: hsla(0, 0%, 100%, 0.45);
+  cursor: pointer;
+  padding: 10px;
+  margin: 0 5px;
+  box-sizing: border-box;
+}
+
+.action-icon-item:hover {
+  color: #fff;
+}

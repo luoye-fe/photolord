@@ -205,6 +205,7 @@ run
 .ice
 build
 public
+!web-ui/public
 
 db
 !db/.gitkeep

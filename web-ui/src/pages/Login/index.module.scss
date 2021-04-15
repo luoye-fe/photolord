@@ -1,0 +1,18 @@
+.container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.main {
+  background-color: #fff;
+  width: 650px;
+  border-radius: 6px;
+  padding: 40px 20px;
+}
+
+.form {
+  width: 410px;
+  margin: 0 auto;
+}

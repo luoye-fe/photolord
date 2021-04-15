@@ -22,9 +22,8 @@ export default (appInfo: EggAppInfo): DefaultConfig => {
   };
 
   config.cors = {
-    origin: () => {
-      return '127.0.0.1:7001';
-    },
+    origin: '*',
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
     credentials: true,
   };
 

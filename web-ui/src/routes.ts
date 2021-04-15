@@ -1,21 +1,22 @@
 import BasicLayout from '@/layouts/BasicLayout';
+
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import NotFound from '@/pages/NotFound';
 
 const routerConfig = [{
-  path: '/home',
+  path: '/',
   component: BasicLayout,
   children: [{
-    path: '/',
+    path: '/home',
     component: Home,
+  }, {
+    path: '/login',
+    component: Login,
+  }, {
+    path: '/',
+    redirect: '/home',
   }],
-}, {
-  path: '/login',
-  component: Login,
-}, {
-  path: '/',
-  redirect: '/home',
 }, {
   component: NotFound,
 }];

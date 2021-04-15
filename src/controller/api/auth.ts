@@ -22,7 +22,7 @@ export class ApiAuthController {
     const { username, password } = ctx.query;
     if (!username || !password) return ctx.fail(400, ctx.errorCode.Params_Error);
 
-    const [usernameItem, passwordItem, passwordSaltItem] = await this.settingModel.find({
+    const result = await this.settingModel.find({
       where: [{
         key: 'username',
       }, {
@@ -30,6 +30,16 @@ export class ApiAuthController {
       }, {
         key: 'password_salt',
       }],
+    });
+
+    let usernameItem = null;
+    let passwordItem = null;
+    let passwordSaltItem = null;
+
+    (result || []).forEach(item => {
+      if (item.key === 'username') usernameItem = item;
+      if (item.key === 'password') passwordItem = item;
+      if (item.key === 'password_salt') passwordSaltItem = item;
     });
 
     if (usernameItem) {

@@ -23,6 +23,7 @@
     "antd": "^4.15.1",
     "axios": "^0.21.1",
     "chokidar": "^3.5.1",
+    "classnames": "^2.3.1",
     "egg": "^2.29.3",
     "egg-cors": "^2.2.3",
     "egg-scripts": "^2.13.0",
@@ -37,6 +38,7 @@
     "react-dom": "^16.4.1",
     "sharp": "^0.27.2",
     "sqlite3": "^5.0.2",
+    "trianglify": "^4.1.1",
     "tsconfig-paths": "^3.9.0",
     "typeorm": "^0.2.32",
     "uuid": "^8.3.2"
