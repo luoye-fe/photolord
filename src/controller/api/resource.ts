@@ -23,20 +23,26 @@ export class ApiResourceController {
 
   @Get('/list')
   async list(ctx: Context) {
-    const { page = '1', size = '10', libraryId } = ctx.query;
-    if (!libraryId) return ctx.fail(400, ctx.errorCode.Params_Error);
+    const { page = '1', size = '10' } = ctx.query;
+
+    const nPage = Number(page);
+    const nSize = Number(size);
 
     const result = await this.resourceModel.find({
-      take: Number(size),
-      skip: (Number(page) - 1) * Number(size),
+      take: nSize,
+      skip: (nPage - 1) * nSize,
       order: {
         gmt_create: 'DESC',
       },
     });
 
+    const count = await this.resourceModel.count();
+
     ctx.success({
-      page,
-      size,
+      page: nPage,
+      size: nSize,
+      count,
+      hasMore: count > page * size,
       list: result,
     });
   }
