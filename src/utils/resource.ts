@@ -56,7 +56,7 @@ export async function analyzeFile(filePath: string): Promise<IResourceInfo> {
   try {
     exifInfo = await exifr.parse(fileBufferData);
   } catch (e) {
-    global.agent.logger.info('get resource exif error, does not affect the main process.');
+    global.agent.logger.info(`Get resource exif error, does not affect the main process, ${filePath}`);
     global.agent.logger.error(e);
   }
   const md5 = md5Buffer(fileBufferData);
