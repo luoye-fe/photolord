@@ -129,6 +129,7 @@ export default class ApiResourceService {
       height: info.height,
       name: info.name,
       path: info.path,
+      md5: info.md5,
     };
   }
 }
