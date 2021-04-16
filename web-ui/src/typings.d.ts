@@ -15,6 +15,12 @@ interface PhotoInfo {
   path: string;
   md5: string;
 }
+
+interface BreadcrumbConfig {
+  text: string;
+  menu?: BreadcrumbConfig[];
+}
+
 declare module '*.module.scss' {
   const classes: { [key: string]: string };
   export default classes;

@@ -1,11 +1,6 @@
 import React from 'react';
 import styles from './index.module.scss';
 
-export interface BreadcrumbConfig {
-  text: string;
-  menu?: BreadcrumbConfig[];
-}
-
 interface PropsType {
   photoCount?: number;
   breadcrumb?: BreadcrumbConfig[];

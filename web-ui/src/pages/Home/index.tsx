@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Spin } from 'antd';
 import fetch from '@/common/fetch';
+import Spin from '@/components/Loading';
 
 import TitleBar from './components/TitleBar';
-import ActionBar, { BreadcrumbConfig } from './components/ActionBar';
+import ActionBar from './components/ActionBar';
 
 import LibraryTab from './components/LibraryTab';
 import TimelineTab from './components/TimelineTab';
@@ -59,7 +59,7 @@ export default function Home() {
           photoCount={photoCount}
           breadcrumb={breadcrumbConfig}
         />
-        <div className={styles.main}>
+        <div className={styles.main} id="main-container">
           {activeTabIndex === 0 && <LibraryTab />}
           {activeTabIndex === 1 && <TimelineTab
             onBreadcrumbChange={handleBreadcrumbChange}
