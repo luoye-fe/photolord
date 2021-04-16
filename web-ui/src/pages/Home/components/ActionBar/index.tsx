@@ -12,8 +12,7 @@ interface PropsType {
 }
 
 const ActionBar = (props: PropsType) => {
-  const { photoCount = 0, breadcrumb = [] } = props;
-  console.log(photoCount, breadcrumb);
+  // const { photoCount = 0, breadcrumb = [] } = props;
   return (
     <div className={styles.container}>
       <div className={styles.breadcrumb}>

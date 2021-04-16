@@ -1,6 +1,20 @@
 interface IPlainObject {
   [key: string]: any;
 }
+
+interface PhotoInfo {
+  id: number;
+  libraryId: number;
+  createDate: string;
+  modifyDate: string;
+  format: string;
+  size: number;
+  width: number;
+  height: number;
+  name: string;
+  path: string;
+  md5: string;
+}
 declare module '*.module.scss' {
   const classes: { [key: string]: string };
   export default classes;
