@@ -1,11 +1,12 @@
 import * as path from 'path';
 import sharp from 'sharp';
-import { Controller, Get, Provide } from '@midwayjs/decorator';
+import { Controller, Get, Inject, Provide } from '@midwayjs/decorator';
 import { InjectEntityModel } from '@midwayjs/orm';
 import { Repository } from 'typeorm';
 
 import { LibraryModel } from '@/entity/library';
 import { ResourceModel } from '@/entity/resource';
+import ResourceService from '@/service/api/resource';
 import { Context } from 'node:vm';
 
 @Provide()
@@ -21,6 +22,9 @@ export class ApiResourceController {
   @InjectEntityModel(ResourceModel)
   resourceModel: Repository<ResourceModel>;
 
+  @Inject()
+  resourceService: ResourceService;
+
   @Get('/list')
   async list(ctx: Context) {
     const { page = '1', size = '10' } = ctx.query;
@@ -32,7 +36,7 @@ export class ApiResourceController {
       take: nSize,
       skip: (nPage - 1) * nSize,
       order: {
-        gmt_create: 'DESC',
+        create_date: 'DESC',
       },
     });
 
@@ -43,7 +47,7 @@ export class ApiResourceController {
       size: nSize,
       count,
       hasMore: count > page * size,
-      list: result,
+      list: result.map(this.resourceService.formatResourceInfo),
     });
   }
 

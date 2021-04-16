@@ -116,4 +116,19 @@ export default class ApiResourceService {
     this.processFileList.push(resourceActionInfo);
     this.queueHandleFile();
   }
+
+  public formatResourceInfo(info: ResourceModel) {
+    return {
+      id: info.id,
+      libraryId: info.library_id,
+      createDate: info.create_date,
+      modifyDate: info.modify_date,
+      format: info.format,
+      size: info.size,
+      width: info.width,
+      height: info.height,
+      name: info.name,
+      path: info.path,
+    };
+  }
 }
