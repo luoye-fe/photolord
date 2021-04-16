@@ -1,0 +1,19 @@
+.file {
+  display: inline-block;
+  padding: 4px;
+}
+
+.file-main {
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: rgba($color: (#000), $alpha: 0.3);
+}
+
+.file-image {
+  opacity: 0;
+  transition: opacity ease 0.3s;
+}
+
+.file-image-show {
+  opacity: 1;
+}
