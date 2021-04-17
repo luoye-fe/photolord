@@ -6,6 +6,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Spin from '@/components/Loading';
 import FileItem from '@/components/FileItem';
 import fetch from '@/common/fetch';
+import LoadingMore from '../LoadingMore';
 import styles from './index.module.scss';
 
 interface PropsType {
@@ -80,7 +81,7 @@ const TimelineTab = (props: PropsType) => {
         dataLength={hasLoadCount}
         next={fetchPhotoList}
         hasMore={hasMore}
-        loader={<p>Loading ...</p>}
+        loader={<LoadingMore />}
         scrollableTarget={scrollableTarget}>
         {Object.keys(photoListByDay).map(day => (
           <div key={day}>
@@ -88,7 +89,6 @@ const TimelineTab = (props: PropsType) => {
             {photoListByDay[day].map(item => <FileItem key={item.id} photo={item} />)}
           </div>
         ))}
-        <p>Loading ...</p>
       </InfiniteScroll>
     </Spin>
   );
