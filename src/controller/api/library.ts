@@ -129,7 +129,12 @@ export class ApiLibraryController {
 
   }
 
-  private formatLibraryResult(source) {
-    return source;
+  private formatLibraryResult(source: LibraryModel) {
+    return {
+      id: source.id,
+      path: source.path,
+      comment: source.comment,
+      analyzeIng: source.analyse_ing,
+    };
   }
 }

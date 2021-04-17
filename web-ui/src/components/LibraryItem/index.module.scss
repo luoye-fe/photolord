@@ -1,0 +1,40 @@
+.library-item-container {
+  display: inline-block;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.library-item-main {
+  width: 300px;
+  height: 160px;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: hsla(0, 0%, 100%, 0.75);
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.iconfont {
+  font-size: 58px;
+  font-weight: bold;
+  text-align: center;
+  display: block;
+}
+
+.path {
+  font-size: 18px;
+  margin: 0;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comment {
+  font-size: 14px;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

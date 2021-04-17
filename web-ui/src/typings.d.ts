@@ -16,6 +16,13 @@ interface PhotoInfo {
   md5: string;
 }
 
+interface LibraryInfo {
+  id: number;
+  path: string;
+  comment: string;
+  analyseIng: 0 | 1;
+}
+
 interface BreadcrumbConfig {
   text: string;
   menu?: BreadcrumbConfig[];
