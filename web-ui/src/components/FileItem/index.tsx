@@ -55,9 +55,7 @@ const FileItem = (props: PropsType) => {
 
   return (
     <div className={styles.file}>
-      <div ref={containerElement} className={classnames([styles['file-main'], {
-        [styles['file-main-loaded']]: !loading,
-      }])} style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}>
+      <div ref={containerElement} className={classnames([styles['file-main']])} style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}>
         {imageSrc && <img ref={imageElement} className={classnames(styles['file-image'], !loading && styles['file-image-show'])} src={imageSrc} />}
         <div className={styles['file-action-container']}>
           <div className={styles['file-action-icons']}>
