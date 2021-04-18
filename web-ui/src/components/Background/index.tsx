@@ -1,11 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import * as trianglify from 'trianglify';
+import debounce from 'lodash/debounce';
 import styles from './index.module.scss';
 
 export default function Background() {
   const canvasRef = useRef(null);
 
-  useEffect(() => {
+  const setBg = useCallback(() => {
     const pattern = trianglify({
       width: window.innerWidth,
       height: window.innerHeight,
@@ -16,6 +17,12 @@ export default function Background() {
     });
 
     pattern.toCanvas(canvasRef.current);
+  }, []);
+
+  useEffect(() => {
+    setBg();
+
+    window.addEventListener('resize', debounce(setBg, 300), true);
   }, []);
   return (
     <div className={styles['main-bg']}>
