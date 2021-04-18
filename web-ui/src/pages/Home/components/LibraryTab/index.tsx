@@ -10,6 +10,14 @@ const LibraryTab = () => {
   const [loading, setLoading] = useState(false);
   const [libraryList, setLibraryList] = useState<LibraryInfo[]>([]);
 
+  function handleLibraryAddClick() {
+    console.log('handleLibraryAddClick');
+  }
+
+  function handleLibraryDetailClick(library: LibraryInfo) {
+    console.log('handleLibraryDetailClick', library);
+  }
+
   useEffect(() => {
     setLoading(true);
     fetch({
@@ -29,7 +37,8 @@ const LibraryTab = () => {
   return (
     <Spin spinning={loading}>
       <div className={styles['library-list']}>
-        {libraryList.map(i => (<LibraryItem key={i.id} library={i} />))}
+        {libraryList.map(i => (<LibraryItem key={i.id} library={i} onLibraryDetailClick={handleLibraryDetailClick} />))}
+        <LibraryItem mode="add" onLibraryAddClick={handleLibraryAddClick} />
       </div>
     </Spin>
   );

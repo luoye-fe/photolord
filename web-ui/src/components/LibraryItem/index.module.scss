@@ -13,13 +13,9 @@
   overflow: hidden;
   padding: 10px;
   box-sizing: border-box;
-}
-
-.iconfont {
-  font-size: 58px;
-  font-weight: bold;
-  text-align: center;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .path {
@@ -29,6 +25,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-top: 6px;
+  display: block;
 }
 
 .comment {
@@ -37,4 +35,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: block;
+  margin-top: 4px;
 }
