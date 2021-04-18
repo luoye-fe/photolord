@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { config } from 'ice';
 import classnames from 'classnames';
+import { getItemSuitableHeight } from '@/common/util';
 
 import styles from './index.module.scss';
 import iconStyles from '@/common/iconfont.module.scss';
@@ -15,7 +16,7 @@ const FileItem = (props: PropsType) => {
   const { photo } = props;
   const { width, height } = photo;
 
-  const imageHeight = 100;
+  const imageHeight = getItemSuitableHeight();
   const imageWidth = width / height * imageHeight;
   const imageResultUrl = `${baseURL}/transcode?md5=${photo.md5}&height=${imageHeight}`;
 
