@@ -3,6 +3,7 @@ import { config } from 'ice';
 import classnames from 'classnames';
 
 import styles from './index.module.scss';
+import iconStyles from '@/common/iconfont.module.scss';
 
 const { baseURL } = config;
 
@@ -54,8 +55,15 @@ const FileItem = (props: PropsType) => {
 
   return (
     <div className={styles.file}>
-      <div ref={containerElement} className={styles['file-main']} style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}>
+      <div ref={containerElement} className={classnames([styles['file-main'], {
+        [styles['file-main-loaded']]: !loading,
+      }])} style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}>
         {imageSrc && <img ref={imageElement} className={classnames(styles['file-image'], !loading && styles['file-image-show'])} src={imageSrc} />}
+        <div className={styles['file-action-container']}>
+          <div className={styles['file-action-icons']}>
+            <i className={classnames([styles['icon-point'], iconStyles['iconfont'], iconStyles['icon-point']])} />
+          </div>
+        </div>
       </div>
     </div>
   );

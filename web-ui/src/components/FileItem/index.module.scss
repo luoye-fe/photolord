@@ -6,7 +6,51 @@
 .file-main {
   border-radius: 6px;
   overflow: hidden;
-  background-color: rgba($color: (#000), $alpha: 0.3);
+  background-color: rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  cursor: pointer;
+  position: relative;
+}
+
+.file-main-loaded {
+  background-color: transparent;
+}
+
+.file-action-container {
+  opacity: 0;
+  transition: opacity ease 0.3s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.file-main:hover {
+  box-shadow: 0 0 0 1px #e5a00d, 0 0 4px rgb(0 0 0 / 30%);
+
+  .file-action-container {
+    background:
+      radial-gradient(
+        farthest-corner at 50% 50%,
+        rgba(50, 50, 50, 0.5) 50%,
+        #323232 100%
+      );
+    opacity: 1;
+  }
+}
+
+.file-action-icons {
+  display: flex;
+}
+
+.icon-point {
+  color: hsla(0, 0%, 100%, 0.75);
 }
 
 .file-image {
