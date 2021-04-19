@@ -1,44 +1,33 @@
 import React from 'react';
-import { FolderOpenOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { FolderOpenOutlined, EllipsisOutlined } from '@ant-design/icons';
+import classnames from 'classnames';
+import { Menu, Dropdown } from 'antd';
 
 import styles from './index.module.scss';
 
 interface PropsType {
-  library?: LibraryInfo;
-  mode?: string;
-  onLibraryAddClick?: () => void;
-  onLibraryDetailClick?: (library: LibraryInfo) => void;
+  library: LibraryInfo;
 }
 
 const LibraryItem = (props: PropsType) => {
-  const { library, mode = 'detail', onLibraryAddClick, onLibraryDetailClick } = props;
-
-  function handleLibraryAddClick() {
-    if (!onLibraryAddClick) return;
-    onLibraryAddClick();
-  }
-
-  function handleLibraryDetailClick() {
-    if (!onLibraryDetailClick || !library) return;
-    onLibraryDetailClick(library);
-  }
+  const { library } = props;
 
   return (
     <div className={styles['library-item-container']} title={library && library.path}>
-      {mode === 'detail' && library && (
-        <div className={styles['library-item-main']} onClick={handleLibraryDetailClick}>
-          <FolderOpenOutlined style={{ fontSize: '58px' }} />
-          <p className={styles.path} title={library.path}>{library.path}</p>
-          {styles.comment && <p className={styles.comment} title={library.comment}>{library.comment}</p>}
-        </div>
-      )}
-      {mode === 'add' && (
-        <div className={styles['library-item-main']} onClick={handleLibraryAddClick}>
-          <PlusCircleOutlined style={{ fontSize: '58px' }} />
-          <p className={styles.path} style={{ textAlign: 'center' }}>Add New Library</p>
-          <p className={styles.comment}>&nbsp;</p>
-        </div>
-      )}
+      <FolderOpenOutlined className={styles['icon-folder']} />
+      <div className={styles.info}>
+        <div><p className={classnames([styles.path, styles.text])} title={library.path}>{library.path}</p></div>
+        {styles.comment && <div><p className={classnames([styles.comment, styles.text])} title={library.comment}>{library.comment}</p></div>}
+      </div>
+      <Dropdown overlay={(
+        <ul className={styles['library-action-menu']}>
+          <li className={styles['library-action-menu-item']}>Scan Library</li>
+          <li className={styles['library-action-menu-item']}>Edit Library</li>
+          <li className={styles['library-action-menu-item']}>Delete Library</li>
+        </ul>
+      )}>
+        <EllipsisOutlined className={styles['icon-setting']} />
+      </Dropdown>
     </div>
   );
 };

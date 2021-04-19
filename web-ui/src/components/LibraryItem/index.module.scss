@@ -1,40 +1,93 @@
 .library-item-container {
-  display: inline-block;
-  padding: 4px;
-  cursor: pointer;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  background-color: hsla(0, 0%, 100%, 0.02);
+  margin-bottom: 12px;
 }
 
-.library-item-main {
-  width: 300px;
-  height: 160px;
-  background-color: rgba(0, 0, 0, 0.3);
+.icon-folder {
+  margin-right: 14px;
+  font-size: 18px;
   color: hsla(0, 0%, 100%, 0.75);
-  border-radius: 6px;
+  transition: color ease 0.3s;
+}
+
+.info {
+  flex: 1;
+  font-size: 0;
+}
+
+.text {
+  color: hsla(0, 0%, 100%, 0.6);
   overflow: hidden;
-  padding: 10px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  display: inline-block;
+  transition: color ease 0.3s;
 }
 
 .path {
-  font-size: 18px;
+  font-size: 14px;
   margin: 0;
-  font-weight: bold;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-top: 6px;
-  display: block;
+  cursor: pointer;
+  line-height: 18px;
+}
+
+.path:hover {
+  text-decoration: underline;
 }
 
 .comment {
-  font-size: 14px;
+  font-size: 12px;
   margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
   margin-top: 4px;
+  line-height: 16px;
+}
+
+.icon-setting {
+  margin-left: 14px;
+  font-size: 22px;
+  color: hsla(0, 0%, 100%, 0.75);
+  transition: color ease 0.3s;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.library-item-container:hover {
+  background-color: hsla(0, 0%, 100%, 0.06);
+
+  .icon,
+  .path,
+  .icon-setting {
+    color: #fff;
+  }
+}
+
+.library-action-menu {
+  background-color: #191a1c;
+  width: 180px;
+  box-sizing: border-box;
+  padding: 8px 0;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 35%);
+}
+
+.library-action-menu-item {
+  background-color: #191a1c;
+  color: hsla(0, 0%, 100%, 0.7);
+  font-size: 14px;
+  line-height: 30px;
+  cursor: pointer;
+  list-style: none;
+  display: block;
+  padding: 0 20px;
+  transition: all ease 0.3s;
+}
+
+.library-action-menu-item:hover {
+  background-color: hsla(0, 0%, 100%, 0.08);
+  color: #fff;
 }
