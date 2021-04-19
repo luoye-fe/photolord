@@ -5,25 +5,13 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 import Spin from '@/components/Loading';
 import FileItem from '@/components/FileItem';
+import ListTitle from '@/components/ListTitle';
 import fetch from '@/common/fetch';
 import LoadingMore from '../LoadingMore';
-import styles from './index.module.scss';
 
 interface PropsType {
   onBreadcrumbChange?: (breadcrumbConfig: BreadcrumbConfig[]) => void;
   onPhotoCountChange?: (count: number) => void;
-}
-
-interface DayTitlePropsType {
-  day: string;
-}
-
-function DayTitle(props: DayTitlePropsType) {
-  return (
-    <div className={styles['day-title']}>
-      <p className={styles['day-title-text']}>{props.day}</p>
-    </div>
-  );
 }
 
 const TimelineTab = (props: PropsType) => {
@@ -85,7 +73,7 @@ const TimelineTab = (props: PropsType) => {
         scrollableTarget={scrollableTarget}>
         {Object.keys(photoListByDay).map(day => (
           <div key={day}>
-            <DayTitle day={day} />
+            <ListTitle text={day} />
             {photoListByDay[day].map(item => <FileItem key={item.id} photo={item} />)}
           </div>
         ))}
