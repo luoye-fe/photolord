@@ -1,3 +1,7 @@
+export const common = {
+  
+};
+
 export const exifInfo = {
   'imagewidth': '宽度',
   'imagelength': '高度',
@@ -179,5 +183,6 @@ export const exifInfo = {
 };
 
 export default {
+  common,
   exifInfo,
 };

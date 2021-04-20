@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-import Spin from '@/components/Loading';
 import FileItem from '@/components/FileItem';
 import ListTitle from '@/components/ListTitle';
 import fetch from '@/common/fetch';
+
+import RootContext from '@/store/context';
+
 import LoadingMore from '../LoadingMore';
 
 interface PropsType {
@@ -17,18 +19,26 @@ interface PropsType {
 const TimelineTab = (props: PropsType) => {
   const size = 50;
   const scrollableTarget = document.getElementById('main-container');
-  const [pageLoading, setPageLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [photoListByDay, setPhotoListByDay] = useState<{ [key: string]: PhotoInfo[] }>({});
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [hasLoadCount, setHasLoadCount] = useState(0);
 
+  const {
+    dispatch,
+  } = useContext(RootContext);
+
   function fetchPhotoList() {
     if (loading) return;
 
     setLoading(true);
-    if (page === 1) setPageLoading(true);
+    if (page === 1) {
+      dispatch({
+        type: 'loading',
+        payload: true,
+      });
+    }
 
     fetch({
       url: '/resource/list',
@@ -49,13 +59,21 @@ const TimelineTab = (props: PropsType) => {
         setHasLoadCount(hasLoadCount + list.length);
         setHasMore(hasMore);
         setPhotoListByDay(photoListByDay);
-        setPageLoading(false);
         setLoading(false);
+
+        dispatch({
+          type: 'loading',
+          payload: false,
+        });
       })
       .catch(e => {
         message.error(e.message);
-        setPageLoading(false);
         setLoading(false);
+
+        dispatch({
+          type: 'loading',
+          payload: false,
+        });
       });
   }
 
@@ -64,21 +82,19 @@ const TimelineTab = (props: PropsType) => {
   }, []);
 
   return (
-    <Spin spinning={pageLoading}>
-      <InfiniteScroll
-        dataLength={hasLoadCount}
-        next={fetchPhotoList}
-        hasMore={hasMore}
-        loader={<LoadingMore />}
-        scrollableTarget={scrollableTarget}>
-        {Object.keys(photoListByDay).map(day => (
-          <div key={day}>
-            <ListTitle text={day} />
-            {photoListByDay[day].map(item => <FileItem key={item.id} photo={item} />)}
-          </div>
-        ))}
-      </InfiniteScroll>
-    </Spin>
+    <InfiniteScroll
+      dataLength={hasLoadCount}
+      next={fetchPhotoList}
+      hasMore={hasMore}
+      loader={<LoadingMore />}
+      scrollableTarget={scrollableTarget}>
+      {Object.keys(photoListByDay).map(day => (
+        <div key={day}>
+          <ListTitle text={day} />
+          {photoListByDay[day].map(item => <FileItem key={item.id} photo={item} />)}
+        </div>
+      ))}
+    </InfiniteScroll>
   );
 };
 

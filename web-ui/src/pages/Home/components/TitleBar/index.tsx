@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import classnames from 'classnames';
+
+import RootContext from '@/store/context';
 
 import iconStyles from '@/common/iconfont.module.scss';
 import styles from './index.module.scss';
@@ -7,7 +9,6 @@ import styles from './index.module.scss';
 interface PropsType {
   tabList: string[];
   activeTabIndex: number;
-  disableTabClick?: boolean;
   onActiveTabIndexChange: (index: number) => void;
 }
 
@@ -16,11 +17,14 @@ const TitleBar = (props: PropsType) => {
     tabList = [],
     activeTabIndex,
     onActiveTabIndexChange,
-    disableTabClick = false,
   } = props;
 
+  const {
+    state,
+  } = useContext(RootContext);
+
   function handleActionItemClick(index: number) {
-    if (disableTabClick) return;
+    if (state.loading) return;
     onActiveTabIndexChange(index);
   }
 

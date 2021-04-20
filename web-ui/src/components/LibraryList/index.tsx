@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { message, Spin, Button } from 'antd';
+import React, { useState, useEffect, useContext } from 'react';
+import { message, Button } from 'antd';
 
 import LibraryItem from '@/components/LibraryItem';
 import LibrarySetting from '@/components/LibrarySetting';
 import fetch from '@/common/fetch';
+import RootContext from '@/store/context';
+
 import styles from './index.module.scss';
 
 const LibraryList = () => {
   // const [dir, serDir] = useState<string[]>([]);
   const [libraryInfo, setLibraryInfo] = useState<LibraryInfo | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
   const [libraryList, setLibraryList] = useState<LibraryInfo[]>([]);
   const [mode, setMode] = useState('add');
   const [showLibrarySettingModal, setShowLibrarySettingModal] = useState(false);
+
+  const {
+    dispatch,
+  } = useContext(RootContext);
 
   function handleAddLibrary() {
     setMode('add');
@@ -47,23 +52,32 @@ const LibraryList = () => {
   }
 
   useEffect(() => {
-    setLoading(true);
+    dispatch({
+      type: 'loading',
+      payload: true,
+    });
     fetch({
       url: '/library/list',
     })
       .then(res => {
         const { list = [] } = res.data;
         setLibraryList(list);
-        setLoading(false);
+        dispatch({
+          type: 'loading',
+          payload: false,
+        });
       })
       .catch(e => {
         message.error(e.message);
-        setLoading(false);
+        dispatch({
+          type: 'loading',
+          payload: false,
+        });
       });
   }, []);
 
   return (
-    <Spin spinning={loading}>
+    <>
       <div className={styles['library-list']}>
         <div className={styles['library-collect']}>
           <p className={styles['library-collect-info']}>{libraryList.length} Libraries</p>
@@ -74,7 +88,7 @@ const LibraryList = () => {
         {libraryList.map(i => (<LibraryItem key={i.id} library={i} onEnterLibrary={handleEnterLibrary} onDeleteLibrary={handleDeleteLibrary} onEditLibrary={handleEditLibrary} onScanLibrary={handleScanLibrary} />))}
       </div>
       <LibrarySetting mode={mode} libraryInfo={libraryInfo} show={showLibrarySettingModal} onCancel={handleLibrarySettingCancel} onConfirm={handleLibrarySettingConfirm} />
-    </Spin>
+    </>
   );
 };
 
