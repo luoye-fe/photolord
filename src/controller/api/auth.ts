@@ -66,10 +66,12 @@ export class ApiAuthController {
       const salt = uuidv4();
       const encryptedPassword = this.encryptPassword(DEFAULT_PASSWORD, salt);
 
+      // init all setting config
       await this.settingModel.save([
         { key: 'username', value: DEFAULT_USER_NAME },
         { key: 'password', value: encryptedPassword },
         { key: 'password_salt', value: salt },
+        { key: 'locale', value: 'en' },
       ]);
 
       return ctx.success({

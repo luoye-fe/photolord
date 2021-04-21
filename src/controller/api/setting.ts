@@ -18,6 +18,21 @@ export class ApiSettingController {
 
   @Get('/info')
   async list(ctx: Context) {
-    ctx.success({});
+    const result = await this.settingModel.find();
+
+    const settingDefaultConfig = {
+      locale: 'en',
+    };
+
+    const response = {};
+
+    result.forEach(item => {
+      if (settingDefaultConfig[item.key]) response[item.key] = item.value;
+    });
+
+    ctx.success({
+      ...settingDefaultConfig,
+      ...response,
+    });
   }
 }
