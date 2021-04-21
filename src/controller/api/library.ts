@@ -59,7 +59,7 @@ export class ApiLibraryController {
 
   @Options('/create')
   @Post('/create')
-  async crate(ctx: Context): Promise<IResponse> {
+  async create(ctx: Context): Promise<IResponse> {
     const { path, comment = '' } = ctx.request.body;
     if (!path) return ctx.fail(400, ctx.errorCode.Params_Error);
 
@@ -85,6 +85,23 @@ export class ApiLibraryController {
     });
 
     await publishLibraryUpdateMessage();
+    ctx.success(result);
+  }
+
+  @Options('/update')
+  @Post('/update')
+  async update(ctx: Context): Promise<IResponse> {
+    const { id, comment = '' } = ctx.request.body;
+    if (!id) return ctx.fail(400, ctx.errorCode.Params_Error);
+
+    const library = await this.libraryModel.findOne({ id: Number(id) });
+    if (!library) return ctx.fail(400, 'path not exists');
+
+    const result = await this.libraryModel.save({
+      ...library,
+      comment,
+    });
+
     ctx.success(result);
   }
 
