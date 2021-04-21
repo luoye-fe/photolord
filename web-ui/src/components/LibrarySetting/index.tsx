@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Modal, Form, Input, Switch } from 'antd';
 import locale from '@/locales';
 import RootContext from '@/store/context';
@@ -38,6 +38,15 @@ const LibrarySetting = (props: PropsType) => {
     return locale(key, options);
   }
 
+  useEffect(() => {
+    if (show) {
+      formInstance.setFieldsValue({
+        path: libraryInfo?.path,
+        comment: libraryInfo?.comment,
+      });
+    }
+  }, [show]);
+
   return (
     <Modal
       title={mode === 'add' ? getLocaleText('common.add_library') : getLocaleText('common.edit_library')}
@@ -45,10 +54,7 @@ const LibrarySetting = (props: PropsType) => {
       onOk={handleOk}
       onCancel={handleCancel}
       className={styles.container}>
-      <Form layout="vertical" form={formInstance} initialValues={{
-        path: libraryInfo?.path,
-        comment: libraryInfo?.comment,
-      }}>
+      <Form layout="vertical" form={formInstance}>
         <Form.Item
           name="path"
           label={getLocaleText('common.library_path')}
