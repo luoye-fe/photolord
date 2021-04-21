@@ -43,7 +43,7 @@ export function isImage(filePath: string) {
   return IMAGE_EXTENSIONS.find(i => i === path.extname(filePath).slice(1).toLowerCase());
 }
 
-export async function analyzeFile(filePath: string): Promise<IResourceInfo> {
+export async function analyseFile(filePath: string): Promise<IResourceInfo> {
   const fileIsExists = fse.existsSync(filePath);
   if (!fileIsExists) throw new Error('file is not exists');
   if (!isImage(filePath)) throw new Error('file is not image');

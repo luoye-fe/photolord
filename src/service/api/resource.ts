@@ -26,7 +26,7 @@ export default class ApiResourceService {
     if (this.processIngMap.get(id)) return;
     this.processIngMap.set(id, true);
 
-    // update library analyze status
+    // update library analyse status
     this.libraryModel.update(id, {
       analyse_ing: 1,
     });
@@ -37,7 +37,7 @@ export default class ApiResourceService {
       if (!target) {
         this.processIngMap.set(id, false);
 
-        // update library analyze status
+        // update library analyse status
         this.libraryModel.update(id, {
           analyse_ing: 0,
         });

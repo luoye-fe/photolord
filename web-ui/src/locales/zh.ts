@@ -4,6 +4,8 @@ export const common = {
   timeline: '时间线',
   search: '搜索',
   scan_library: '扫描资源库',
+  scan_library_confirm: '扫描资源库将重新分析所有图片，耗时较长',
+  scan_library_begin_message: '开始扫描资源库',
   edit_library: '编辑资源库',
   delete_library: '删除资源库',
   delete_library_confirm: '确认删除当前资源库（不会影响本地文件）？',
@@ -15,7 +17,7 @@ export const common = {
   library_path_input: '请输入资源库绝对路径',
   library_comment: '资源库备注',
   library_comment_input: '请输入资源库备注',
-  auto_analyze: '添加/更新后自动开始分析',
+  auto_analyse: '添加/更新后自动开始分析',
 };
 
 export const exifInfo = {

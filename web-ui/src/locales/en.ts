@@ -4,6 +4,8 @@ export const common = {
   timeline: 'timeline',
   search: 'search',
   scan_library: 'Scan Library',
+  scan_library_confirm: 'Scanning Library Will Re-analyse All Image, Will Take A Long Time',
+  scan_library_begin_message: 'Start Scanning The Library',
   edit_library: 'Edit Library',
   delete_library: 'Delete Library',
   delete_library_confirm: 'Are you sure to delete this Library(does not affect local file)?',
@@ -13,7 +15,7 @@ export const common = {
   update_library_success: 'Update Library Success',
   library_path: 'Library Path',
   library_path_input: 'Please Input Library Absolute Path',
-  auto_analyze: 'Auto start analysis after adding/update',
+  auto_analyse: 'Auto start analysis after adding/update',
 };
 
 export const exifInfo = {

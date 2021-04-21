@@ -3,9 +3,9 @@ import 'tsconfig-paths/register';
 import { Agent } from 'egg';
 import * as chokidar from 'chokidar';
 
-import { IPC_APP_LIBRARY_UPDATE, IPC_AGENT_RESOURCE_UPDATE } from '@/ipc/channel';
+import { IPC_APP_LIBRARY_UPDATE, IPC_AGENT_RESOURCE_UPDATE, IPC_AGENT_LIBRARY_SCAN } from '@/ipc/channel';
 import { LibraryModel } from '@/entity/library';
-import { isImage, analyzeFile } from '@/utils/resource';
+import { isImage, analyseFile } from '@/utils/resource';
 
 interface ProcessFile {
   action: 'add' | 'change' | 'unlink';
@@ -24,6 +24,7 @@ const watchOptions: chokidar.WatchOptions = {
   ignored: /(^|[\/\\])\../, // ignore hidden file
 };
 
+const processFileList: ProcessFile[] = [];
 const watcherList = new Map<string, WatcherItem>();
 
 let processing = false;
@@ -43,10 +44,10 @@ function listenFileChange() {
 
     if (action === 'add') {
       const start = Date.now();
-      global.agent.logger.info(`Analyze file start: ${filePath}`);
+      global.agent.logger.info(`Analyse file start: ${filePath}`);
       try {
-        const fileInfo = await analyzeFile(filePath);
-        global.agent.logger.info(`Analyze file success [${Date.now() - start}ms]: ${filePath}`);
+        const fileInfo = await analyseFile(filePath);
+        global.agent.logger.info(`Analyse file success [${Date.now() - start}ms]: ${filePath}`);
         global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
           action,
           libraryId,
@@ -54,7 +55,7 @@ function listenFileChange() {
           fileInfo,
         });
       } catch (e) {
-        global.agent.logger.info(`Analyze file error [${Date.now() - start}ms]: ${filePath}`);
+        global.agent.logger.info(`Analyse file error [${Date.now() - start}ms]: ${filePath}`);
         global.agent.logger.error(e);
       }
     }
@@ -75,7 +76,10 @@ function listenFileChange() {
   handleOneFile();
 }
 
-const processFileList: ProcessFile[] = [];
+/**
+ * add watcher for all library
+ * @param libraryList 
+ */
 function handleAllLibrary(libraryList: LibraryModel[]) {
   libraryList.forEach(item => {
     const { path: libraryPath, id } = item;
@@ -113,10 +117,22 @@ function handleAllLibrary(libraryList: LibraryModel[]) {
   });
 }
 
+/**
+ * TODO: list library all image file and analyse it
+ * @param libraryInfo 
+ */
+function listLibraryAllFile(libraryInfo: LibraryModel) {
+  console.log(1111, libraryInfo);
+}
+
 export default (agent: Agent) => {
   global.agent = agent;
 
   agent.messenger.on(IPC_APP_LIBRARY_UPDATE, (libraryList: LibraryModel[]) => {
     handleAllLibrary(libraryList);
+  });
+
+  agent.messenger.on(IPC_AGENT_LIBRARY_SCAN, (libraryInfo: LibraryModel) => {
+    listLibraryAllFile(libraryInfo);
   });
 };

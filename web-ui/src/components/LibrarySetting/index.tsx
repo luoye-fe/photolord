@@ -64,7 +64,7 @@ const LibrarySetting = (props: PropsType) => {
         <Form.Item name="comment" label={getLocaleText('common.library_comment')}>
           <Input placeholder={getLocaleText('common.library_comment_input')} />
         </Form.Item>
-        <Form.Item name="autoAnalyze" valuePropName="checked" label={getLocaleText('common.auto_analyze')}>
+        <Form.Item name="autoAnalyse" valuePropName="checked" label={getLocaleText('common.auto_analyse')}>
           <Switch />
         </Form.Item>
       </Form>

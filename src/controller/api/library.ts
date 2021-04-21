@@ -3,7 +3,7 @@ import { Context } from 'egg';
 import * as fs from 'fs';
 import * as pathModule from 'path';
 
-import { publishLibraryUpdateMessage } from '@/ipc/index';
+import { publishLibraryScanMessage, publishLibraryUpdateMessage } from '@/ipc/index';
 import { IResponse } from '@/typings';
 import { isSubDir } from '@/utils/index';
 import { LibraryModel } from '@/entity/library';
@@ -120,6 +120,7 @@ export class ApiLibraryController {
       library_id: Number(id),
     });
 
+    await publishLibraryUpdateMessage();
     ctx.success({
       id,
     });
@@ -134,26 +135,24 @@ export class ApiLibraryController {
       id: Number(id),
     });
 
-    if (result.analyse_ing === 1) return ctx.success({
-      process: true,
-      message: 'analyze ing',
-    });
+    if (result.analyse_ing === 1) {
+      ctx.success({
+        process: true,
+        message: 'analyse ing',
+      });
+      return;
+    }
 
-    // scan message
-    // xxxx
-
-    // update status
     await this.libraryModel.update(id, {
       analyse_ing: 1,
     });
 
+    await publishLibraryScanMessage(result);
+
     ctx.success({
       process: true,
-      message: 'analyze ing',
+      message: 'analyse ing',
     });
-
-    // begin analyze library
-
   }
 
   private formatLibraryResult(source: LibraryModel) {
@@ -161,7 +160,7 @@ export class ApiLibraryController {
       id: source.id,
       path: source.path,
       comment: source.comment,
-      analyzeIng: source.analyse_ing,
+      analyseIng: source.analyse_ing,
     };
   }
 }

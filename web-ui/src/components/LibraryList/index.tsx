@@ -15,6 +15,7 @@ const LibraryList = () => {
   const [libraryList, setLibraryList] = useState<LibraryInfo[]>([]);
   const [mode, setMode] = useState('add');
   const [showLibrarySettingModal, setShowLibrarySettingModal] = useState(false);
+  const [autoUpdateList, setAutoUpdateList] = useState(false);
 
   const {
     state,
@@ -27,9 +28,71 @@ const LibraryList = () => {
     return locale(key, options);
   }
 
+  async function getLibraryList(mute = false): Promise<LibraryInfo[]> {
+    if (!mute) {
+      dispatch({
+        type: RootReducerActionType.SET_LOADING,
+        payload: true,
+      });
+    }
+
+    try {
+      const res = await fetch({
+        url: '/library/list',
+      });
+      const { list = [] } = res.data;
+      if (!mute) {
+        setLibraryList(list);
+        dispatch({
+          type: RootReducerActionType.SET_LOADING,
+          payload: false,
+        });
+      }
+      return list as LibraryInfo[];
+    } catch (e) {
+      if (!mute) {
+        message.error(e.message);
+        dispatch({
+          type: RootReducerActionType.SET_LOADING,
+          payload: false,
+        });
+      }
+    }
+
+    return [];
+  }
+
+  function autoGetLibraryList() {
+    if (!autoUpdateList) return;
+
+    const handle = async () => {
+      const list = await getLibraryList(true);
+
+      // all library not scanning, stop auto update
+      if (!list.find(i => i.analyseIng === 1)) {
+        setAutoUpdateList(false);
+        return;
+      }
+
+      setTimeout(() => {
+        handle();
+      }, 1000);
+    };
+
+    setTimeout(() => {
+      handle();
+    }, 1000);
+  }
+
   function handleAddLibrary() {
     setMode('add');
     setLibraryInfo(undefined);
+    setShowLibrarySettingModal(true);
+  }
+
+  function handleEditLibrary(libraryId: number) {
+    setMode('edit');
+    setLibraryInfo(libraryList.find(i => i.id === libraryId));
     setShowLibrarySettingModal(true);
   }
 
@@ -37,7 +100,7 @@ const LibraryList = () => {
     setShowLibrarySettingModal(false);
   }
 
-  function handleLibrarySettingConfirm(res) {
+  function handleLibrarySettingConfirm(res: LibraryInfo) {
     dispatch({
       type: RootReducerActionType.SET_LOADING,
       payload: true,
@@ -99,30 +162,26 @@ const LibraryList = () => {
   }
 
   function handleScanLibrary(libraryId: number) {
-    console.log(libraryId);
-  }
-
-  function handleEditLibrary(libraryId: number) {
-    setMode('edit');
-    setLibraryInfo(libraryList.find(i => i.id === libraryId));
-    setShowLibrarySettingModal(true);
-  }
-
-  function getLibraryList() {
     dispatch({
       type: RootReducerActionType.SET_LOADING,
       payload: true,
     });
+
     fetch({
-      url: '/library/list',
+      url: '/library/scan',
+      method: 'POST',
+      data: {
+        id: libraryId,
+      },
     })
-      .then(res => {
-        const { list = [] } = res.data;
-        setLibraryList(list);
+      .then(() => {
+        message.success(getLocaleText('common.scan_library_begin_message'));
+
         dispatch({
           type: RootReducerActionType.SET_LOADING,
           payload: false,
         });
+        setAutoUpdateList(true);
       })
       .catch(e => {
         message.error(e.message);
@@ -134,8 +193,18 @@ const LibraryList = () => {
   }
 
   useEffect(() => {
-    getLibraryList();
+    getLibraryList()
+      .then((list = []) => {
+        // has scanning library, auto update
+        if (list.find(i => i.analyseIng === 1)) {
+          setAutoUpdateList(true);
+        }
+      });
   }, []);
+
+  useEffect(() => {
+    if (autoUpdateList) autoGetLibraryList();
+  }, [autoUpdateList]);
 
   return (
     <>

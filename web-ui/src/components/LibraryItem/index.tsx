@@ -34,9 +34,12 @@ const LibraryItem = (props: PropsType) => {
         <div><p onClick={() => onEnterLibrary(library.id)} className={classnames([styles.path, styles.text])} title={library.path}>{library.path}</p></div>
         {styles.comment && <div><p className={classnames([styles.comment, styles.text])} title={library.comment}>{library.comment}</p></div>}
       </div>
+      {library.analyseIng === 1 && <p>扫描中</p>}
       <Dropdown overlay={(
         <ul className={styles['library-action-menu']}>
-          <li className={styles['library-action-menu-item']} onClick={() => onScanLibrary(library.id)}>{getLocaleText('common.scan_library')}</li>
+          <li className={styles['library-action-menu-item']}>
+            <Popconfirm title={getLocaleText('common.scan_library_confirm')} onConfirm={() => onScanLibrary(library.id)}>{getLocaleText('common.scan_library')}</Popconfirm>
+          </li>
           <li className={styles['library-action-menu-item']} onClick={() => onEditLibrary(library.id)}>{getLocaleText('common.edit_library')}</li>
           <li className={styles['library-action-menu-item']}>
             <Popconfirm title={getLocaleText('common.delete_library_confirm')} onConfirm={() => onDeleteLibrary(library.id)}>{getLocaleText('common.delete_library')}</Popconfirm>
