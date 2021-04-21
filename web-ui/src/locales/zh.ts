@@ -3,12 +3,19 @@ export const common = {
   libraries: '资源库',
   timeline: '时间线',
   search: '搜索',
-  add_library: '新增资源库',
-  delete_library: '删除资源库',
   scan_library: '扫描资源库',
   edit_library: '编辑资源库',
+  delete_library: '删除资源库',
   delete_library_confirm: '确认删除当前资源库（不会影响本地文件）？',
   delete_library_success: '删除资源库成功',
+  add_library: '新增资源库',
+  add_library_success: '新增资源库成功',
+  update_library_success: '更新资源库成功',
+  library_path: '资源库路径',
+  library_path_input: '请输入资源库绝对路径',
+  library_comment: '资源库备注',
+  library_comment_input: '请输入资源库备注',
+  auto_analyze: '添加/更新后自动开始分析',
 };
 
 export const exifInfo = {

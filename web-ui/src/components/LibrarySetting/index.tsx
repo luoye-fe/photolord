@@ -1,7 +1,7 @@
-import React, { useEffect, useContext, useState } from 'react';
-import { Modal } from 'antd';
-import RootContext from '@/store/context';
+import React, { useContext } from 'react';
+import { Modal, Form, Input, Switch } from 'antd';
 import locale from '@/locales';
+import RootContext from '@/store/context';
 
 import styles from './index.module.scss';
 
@@ -9,43 +9,59 @@ interface PropsType {
   mode?: string;
   show: boolean;
   libraryInfo?: LibraryInfo;
-  onConfirm: () => void;
+  onConfirm: (formValue: any) => void;
   onCancel: () => void;
 }
 
 const LibrarySetting = (props: PropsType) => {
-  const { mode = 'add', show, onConfirm, onCancel } = props;
-  const [editActionText, setEditActionText] = useState('Edit Library');
-  const [addActionText, setAddActionText] = useState('Add Library');
+  const { mode = 'add', show, onConfirm, onCancel, libraryInfo } = props;
+  const [formInstance] = Form.useForm();
   const {
     state,
   } = useContext(RootContext);
 
-  useEffect(() => {
-    const _locale = state.setting.locale;
-    const options = { language: _locale };
-    setAddActionText(locale('common.add_library', options));
-    setEditActionText(locale('common.edit_library', options));
-  }, [state.setting.locale]);
-
   function handleOk() {
-    onConfirm();
+    formInstance
+      .validateFields()
+      .then(res => {
+        onConfirm(res);
+      });
   }
 
   function handleCancel() {
     onCancel();
   }
 
+  function getLocaleText(key: string) {
+    const _locale = state.setting.locale;
+    const options = { language: _locale };
+    return locale(key, options);
+  }
+
   return (
     <Modal
-      title={mode === 'add' ? addActionText : editActionText}
+      title={mode === 'add' ? getLocaleText('common.add_library') : getLocaleText('common.edit_library')}
       visible={show}
       onOk={handleOk}
       onCancel={handleCancel}
       className={styles.container}>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
+      <Form layout="vertical" form={formInstance} initialValues={{
+        path: libraryInfo?.path,
+        comment: libraryInfo?.comment,
+      }}>
+        <Form.Item
+          name="path"
+          label={getLocaleText('common.library_path')}
+          rules={[{ required: true, message: getLocaleText('common.library_path_input') }]}>
+          <Input disabled={mode === 'edit'} placeholder={getLocaleText('common.library_path_input')} />
+        </Form.Item>
+        <Form.Item name="comment" label={getLocaleText('common.library_comment')}>
+          <Input placeholder={getLocaleText('common.library_comment_input')} />
+        </Form.Item>
+        <Form.Item name="autoAnalyze" valuePropName="checked" label={getLocaleText('common.auto_analyze')}>
+          <Switch />
+        </Form.Item>
+      </Form>
     </Modal>
   );
 };

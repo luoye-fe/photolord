@@ -21,6 +21,12 @@ const LibraryList = () => {
     dispatch,
   } = useContext(RootContext);
 
+  function getLocaleText(key: string) {
+    const _locale = state.setting.locale;
+    const options = { language: _locale };
+    return locale(key, options);
+  }
+
   function handleAddLibrary() {
     setMode('add');
     setLibraryInfo(undefined);
@@ -31,8 +37,36 @@ const LibraryList = () => {
     setShowLibrarySettingModal(false);
   }
 
-  function handleLibrarySettingConfirm() {
-    setShowLibrarySettingModal(false);
+  function handleLibrarySettingConfirm(res) {
+    dispatch({
+      type: RootReducerActionType.SET_LOADING,
+      payload: true,
+    });
+
+    fetch({
+      url: mode === 'add' ? '/library/create' : '/library/update',
+      method: 'POST',
+      data: mode === 'add' ? {
+        path: res.path,
+        comment: res.comment,
+      } : {
+        id: libraryInfo?.id,
+        comment: res.comment,
+      },
+    })
+      .then(() => {
+        if (mode === 'add') message.success(getLocaleText('common.add_library_success'));
+        if (mode === 'edit') message.success(getLocaleText('common.update_library_success'));
+        getLibraryList();
+        setShowLibrarySettingModal(false);
+      })
+      .catch(e => {
+        message.error(e.message);
+        dispatch({
+          type: RootReducerActionType.SET_LOADING,
+          payload: false,
+        });
+      });
   }
 
   function handleEnterLibrary(libraryId: number) {
@@ -52,7 +86,7 @@ const LibraryList = () => {
       },
     })
       .then(() => {
-        message.success(locale('common.delete_library_success', { language: state.setting.locale }));
+        message.success(getLocaleText('common.delete_library_success'));
         getLibraryList();
       })
       .catch(e => {
@@ -107,9 +141,9 @@ const LibraryList = () => {
     <>
       <div className={styles['library-list']}>
         <div className={styles['library-collect']}>
-          <p className={styles['library-collect-info']}>{libraryList.length} {locale('common.libraries', { language: state.setting.locale, uppercase: 'first' })}</p>
+          <p className={styles['library-collect-info']}>{libraryList.length} {getLocaleText('common.libraries')}</p>
           <div className={styles['library-collect-actions']}>
-            <Button size="small" type="primary" className={styles['library-collect-action']} onClick={handleAddLibrary}>{locale('common.add_library', { language: state.setting.locale, uppercase: 'first' })}</Button>
+            <Button size="small" type="primary" className={styles['library-collect-action']} onClick={handleAddLibrary}>{getLocaleText('common.add_library')}</Button>
           </div>
         </div>
         {libraryList.map(i => (<LibraryItem key={i.id} library={i} onEnterLibrary={handleEnterLibrary} onDeleteLibrary={handleDeleteLibrary} onEditLibrary={handleEditLibrary} onScanLibrary={handleScanLibrary} />))}

@@ -3,12 +3,17 @@ export const common = {
   libraries: 'libraries',
   timeline: 'timeline',
   search: 'search',
-  add_library: 'Add New Library',
-  delete_library: 'Delete Library',
   scan_library: 'Scan Library',
   edit_library: 'Edit Library',
+  delete_library: 'Delete Library',
   delete_library_confirm: 'Are you sure to delete this Library(does not affect local file)?',
   delete_library_success: 'Delete Library Success',
+  add_library: 'Add New Library',
+  add_library_success: 'Add New Library Success',
+  update_library_success: 'Update Library Success',
+  library_path: 'Library Path',
+  library_path_input: 'Please Input Library Absolute Path',
+  auto_analyze: 'Auto start analysis after adding/update',
 };
 
 export const exifInfo = {
