@@ -28,15 +28,6 @@ interface BreadcrumbConfig {
   menu?: BreadcrumbConfig[];
 }
 
-interface RootStateType {
-  loading: boolean;
-}
-
-interface RootReducerType {
-  type: 'loading';
-  payload?: any;
-}
-
 declare module '*.module.scss' {
   const classes: { [key: string]: string };
   export default classes;

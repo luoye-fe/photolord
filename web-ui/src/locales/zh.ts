@@ -1,5 +1,13 @@
 export const common = {
-  
+  library: '资源库',
+  libraries: '资源库',
+  timeline: '时间线',
+  search: '搜索',
+  add_library: '新增资源库',
+  delete_library: '删除资源库',
+  scan_library: '扫描资源库',
+  edit_library: '编辑资源库',
+  delete_library_confirm: '确认删除当前资源库？',
 };
 
 export const exifInfo = {

@@ -8,6 +8,7 @@ import ListTitle from '@/components/ListTitle';
 import fetch from '@/common/fetch';
 
 import RootContext from '@/store/context';
+import { RootReducerActionType } from '@/store/type';
 
 import LoadingMore from '../LoadingMore';
 
@@ -35,7 +36,7 @@ const TimelineTab = (props: PropsType) => {
     setLoading(true);
     if (page === 1) {
       dispatch({
-        type: 'loading',
+        type: RootReducerActionType.SET_LOADING,
         payload: true,
       });
     }
@@ -62,7 +63,7 @@ const TimelineTab = (props: PropsType) => {
         setLoading(false);
 
         dispatch({
-          type: 'loading',
+          type: RootReducerActionType.SET_LOADING,
           payload: false,
         });
       })
@@ -71,7 +72,7 @@ const TimelineTab = (props: PropsType) => {
         setLoading(false);
 
         dispatch({
-          type: 'loading',
+          type: RootReducerActionType.SET_LOADING,
           payload: false,
         });
       });

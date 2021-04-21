@@ -1,5 +1,13 @@
 export const common = {
-
+  library: 'library',
+  libraries: 'libraries',
+  timeline: 'timeline',
+  search: 'search',
+  add_library: 'Add New Library',
+  delete_library: 'Delete Library',
+  scan_library: 'Scan Library',
+  edit_library: 'Edit Library',
+  delete_library_confirm: 'Are you sure to delete this Library?',
 };
 
 export const exifInfo = {

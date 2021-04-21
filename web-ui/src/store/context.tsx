@@ -1,16 +1,19 @@
-import React  from 'react';
+import React from 'react';
+import { RootReducerAction, RootStateType } from './type';
 
-interface ContextType {
-  state: RootStateType;
-  dispatch: React.Dispatch<RootReducerType>;
-}
-
-export const initState = {
+export const initState: RootStateType = {
   loading: true,
+  setting: {
+    locale: 'en',
+  },
 };
 
-export default React.createContext({
+type ContextType = {
+  state: RootStateType;
+  dispatch: (action: RootReducerAction) => void;
+};
+
+export default React.createContext<ContextType>({
   state: initState,
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  dispatch: () => {},
-} as ContextType);
+  dispatch: () => null,
+});

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FolderOpenOutlined, EllipsisOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { Dropdown, Popconfirm } from 'antd';
+import locale from '@/locales';
+import RootContext from '@/store/context';
 
 import styles from './index.module.scss';
 
@@ -15,6 +17,23 @@ interface PropsType {
 
 const LibraryItem = (props: PropsType) => {
   const { library, onEnterLibrary, onScanLibrary, onEditLibrary, onDeleteLibrary } = props;
+  const [deleteActionText, setDeleteActionText] = useState('Delete Library');
+  const [scanActionText, setScanActionText] = useState('Delete Library');
+  const [editActionText, setEditActionText] = useState('Delete Library');
+  const [deleteActionConfirmText, setDeleteActionConfirmText] = useState('Are you sure to delete this Library?');
+  const {
+    state,
+  } = useContext(RootContext);
+
+  useEffect(() => {
+    const _locale = state.setting.locale;
+    const options = { language: _locale };
+    setDeleteActionText(locale('common.delete_library', options));
+    setScanActionText(locale('common.scan_library', options));
+    setEditActionText(locale('common.edit_library', options));
+    setDeleteActionConfirmText(locale('common.delete_library_confirm', options));
+  }, [state.setting.locale]);
+
 
   return (
     <div className={styles['library-item-container']} title={library && library.path}>
@@ -25,12 +44,10 @@ const LibraryItem = (props: PropsType) => {
       </div>
       <Dropdown overlay={(
         <ul className={styles['library-action-menu']}>
-          <li className={styles['library-action-menu-item']} onClick={() => onScanLibrary(library.id)}>Scan Library</li>
-          <li className={styles['library-action-menu-item']} onClick={() => onEditLibrary(library.id)}>Edit Library</li>
+          <li className={styles['library-action-menu-item']} onClick={() => onScanLibrary(library.id)}>{scanActionText}</li>
+          <li className={styles['library-action-menu-item']} onClick={() => onEditLibrary(library.id)}>{editActionText}</li>
           <li className={styles['library-action-menu-item']}>
-            <Popconfirm title="Are you sure to delete this Library?" onConfirm={() => onDeleteLibrary(library.id)}>
-              Delete Library
-            </Popconfirm>
+            <Popconfirm title={deleteActionConfirmText} onConfirm={() => onDeleteLibrary(library.id)}>{deleteActionText}</Popconfirm>
           </li>
         </ul>
       )}>

@@ -5,6 +5,8 @@ import LibraryItem from '@/components/LibraryItem';
 import LibrarySetting from '@/components/LibrarySetting';
 import fetch from '@/common/fetch';
 import RootContext from '@/store/context';
+import { RootReducerActionType } from '@/store/type';
+import locale from '@/locales';
 
 import styles from './index.module.scss';
 
@@ -16,6 +18,7 @@ const LibraryList = () => {
   const [showLibrarySettingModal, setShowLibrarySettingModal] = useState(false);
 
   const {
+    state,
     dispatch,
   } = useContext(RootContext);
 
@@ -53,7 +56,7 @@ const LibraryList = () => {
 
   useEffect(() => {
     dispatch({
-      type: 'loading',
+      type: RootReducerActionType.SET_LOADING,
       payload: true,
     });
     fetch({
@@ -63,14 +66,14 @@ const LibraryList = () => {
         const { list = [] } = res.data;
         setLibraryList(list);
         dispatch({
-          type: 'loading',
+          type: RootReducerActionType.SET_LOADING,
           payload: false,
         });
       })
       .catch(e => {
         message.error(e.message);
         dispatch({
-          type: 'loading',
+          type: RootReducerActionType.SET_LOADING,
           payload: false,
         });
       });
@@ -80,9 +83,9 @@ const LibraryList = () => {
     <>
       <div className={styles['library-list']}>
         <div className={styles['library-collect']}>
-          <p className={styles['library-collect-info']}>{libraryList.length} Libraries</p>
+          <p className={styles['library-collect-info']}>{libraryList.length} {locale('common.libraries', { language: state.setting.locale, uppercase: 'first' })}</p>
           <div className={styles['library-collect-actions']}>
-            <Button size="small" type="primary" className={styles['library-collect-action']} onClick={handleAddLibrary}>Add New Library</Button>
+            <Button size="small" type="primary" className={styles['library-collect-action']} onClick={handleAddLibrary}>{locale('common.add_library', { language: state.setting.locale, uppercase: 'first' })}</Button>
           </div>
         </div>
         {libraryList.map(i => (<LibraryItem key={i.id} library={i} onEnterLibrary={handleEnterLibrary} onDeleteLibrary={handleDeleteLibrary} onEditLibrary={handleEditLibrary} onScanLibrary={handleScanLibrary} />))}
