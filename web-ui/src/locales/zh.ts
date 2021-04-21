@@ -7,7 +7,8 @@ export const common = {
   delete_library: '删除资源库',
   scan_library: '扫描资源库',
   edit_library: '编辑资源库',
-  delete_library_confirm: '确认删除当前资源库？',
+  delete_library_confirm: '确认删除当前资源库（不会影响本地文件）？',
+  delete_library_success: '删除资源库成功',
 };
 
 export const exifInfo = {

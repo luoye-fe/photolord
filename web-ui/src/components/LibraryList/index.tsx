@@ -11,7 +11,6 @@ import locale from '@/locales';
 import styles from './index.module.scss';
 
 const LibraryList = () => {
-  // const [dir, serDir] = useState<string[]>([]);
   const [libraryInfo, setLibraryInfo] = useState<LibraryInfo | undefined>(undefined);
   const [libraryList, setLibraryList] = useState<LibraryInfo[]>([]);
   const [mode, setMode] = useState('add');
@@ -41,7 +40,28 @@ const LibraryList = () => {
   }
 
   function handleDeleteLibrary(libraryId: number) {
-    console.log(libraryId);
+    dispatch({
+      type: RootReducerActionType.SET_LOADING,
+      payload: true,
+    });
+    fetch({
+      url: '/library/delete',
+      method: 'POST',
+      data: {
+        id: libraryId,
+      },
+    })
+      .then(() => {
+        message.success(locale('common.delete_library_success', { language: state.setting.locale }));
+        getLibraryList();
+      })
+      .catch(e => {
+        message.error(e.message);
+        dispatch({
+          type: RootReducerActionType.SET_LOADING,
+          payload: false,
+        });
+      });
   }
 
   function handleScanLibrary(libraryId: number) {
@@ -54,7 +74,7 @@ const LibraryList = () => {
     setShowLibrarySettingModal(true);
   }
 
-  useEffect(() => {
+  function getLibraryList() {
     dispatch({
       type: RootReducerActionType.SET_LOADING,
       payload: true,
@@ -77,6 +97,10 @@ const LibraryList = () => {
           payload: false,
         });
       });
+  }
+
+  useEffect(() => {
+    getLibraryList();
   }, []);
 
   return (

@@ -7,6 +7,7 @@ import { publishLibraryUpdateMessage } from '@/ipc/index';
 import { IResponse } from '@/typings';
 import { isSubDir } from '@/utils/index';
 import { LibraryModel } from '@/entity/library';
+import { ResourceModel } from '@/entity/resource';
 import { Repository } from 'typeorm';
 import { InjectEntityModel } from '@midwayjs/orm';
 
@@ -19,6 +20,9 @@ import { InjectEntityModel } from '@midwayjs/orm';
 export class ApiLibraryController {
   @InjectEntityModel(LibraryModel)
   private libraryModel: Repository<LibraryModel>;
+
+  @InjectEntityModel(ResourceModel)
+  private resourceModel: Repository<ResourceModel>;
 
   @Get('/list')
   async list(ctx: Context) {
@@ -89,8 +93,14 @@ export class ApiLibraryController {
     const { id } = ctx.request.body;
     if (!id) return ctx.fail(400, ctx.errorCode.Params_Error);
 
+    // delete library
     await this.libraryModel.delete({
       id: Number(id),
+    });
+
+    // delete resource
+    await this.resourceModel.delete({
+      library_id: Number(id),
     });
 
     ctx.success({

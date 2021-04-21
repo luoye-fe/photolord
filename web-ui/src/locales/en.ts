@@ -7,7 +7,8 @@ export const common = {
   delete_library: 'Delete Library',
   scan_library: 'Scan Library',
   edit_library: 'Edit Library',
-  delete_library_confirm: 'Are you sure to delete this Library?',
+  delete_library_confirm: 'Are you sure to delete this Library(does not affect local file)?',
+  delete_library_success: 'Delete Library Success',
 };
 
 export const exifInfo = {
