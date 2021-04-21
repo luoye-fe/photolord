@@ -19,17 +19,28 @@ export default class ApiResourceService {
   @InjectEntityModel(ResourceExifModel)
   private resourceExifModel: Repository<ResourceExifModel>;
 
-  private processFileList: IResourceActionResult[] = [];
-  private processIng = false;
+  private processFileMap = new Map<number, IResourceActionResult[]>();
+  private processIngMap = new Map<number, boolean>();
 
-  private queueHandleFile() {
-    if (this.processIng) return;
-    this.processIng = true;
+  private queueHandleFile(id: number) {
+    if (this.processIngMap.get(id)) return;
+    this.processIngMap.set(id, true);
+
+    // update library analyze status
+    this.libraryModel.update(id, {
+      analyse_ing: 1,
+    });
 
     const handOneFile = async () => {
-      const target = this.processFileList[0];
+      const processFileList = this.processFileMap.get(id);
+      const target = processFileList[0];
       if (!target) {
-        this.processIng = false;
+        this.processIngMap.set(id, false);
+
+        // update library analyze status
+        this.libraryModel.update(id, {
+          analyse_ing: 0,
+        });
         return;
       }
 
@@ -64,7 +75,7 @@ export default class ApiResourceService {
         await this.remove(libraryId, resourceRelativePath);
       }
 
-      this.processFileList.shift();
+      processFileList.shift();
       handOneFile.call(this);
     };
 
@@ -113,8 +124,12 @@ export default class ApiResourceService {
 
   // queue handle all file action
   public handle(resourceActionInfo: IResourceActionResult) {
-    this.processFileList.push(resourceActionInfo);
-    this.queueHandleFile();
+    const { libraryId } = resourceActionInfo;
+    const currentLibraryList = this.processFileMap.get(libraryId);
+    if (!currentLibraryList) this.processFileMap.set(libraryId, []);
+
+    this.processFileMap.get(libraryId).push(resourceActionInfo);
+    this.queueHandleFile(libraryId);
   }
 
   public formatResourceInfo(info: ResourceModel) {
