@@ -5,12 +5,12 @@ import * as chokidar from 'chokidar';
 
 import { IPC_APP_LIBRARY_UPDATE, IPC_AGENT_RESOURCE_UPDATE, IPC_APP_LIBRARY_SCAN } from '@/ipc/channel';
 import { LibraryModel } from '@/entity/library';
-import { isImage, analyseFile } from '@/utils/resource';
+import { isImage, analyseResource } from '@/utils/resource';
 
-interface ProcessFile {
+interface ProcessResource {
   action: 'add' | 'change' | 'unlink';
   libraryId: number;
-  filePath: string;
+  resourcePath: string;
 }
 
 interface WatcherItem extends LibraryModel {
@@ -24,38 +24,38 @@ const watchOptions: chokidar.WatchOptions = {
   ignored: /(^|[\/\\])\../, // ignore hidden file
 };
 
-const processFileList: ProcessFile[] = [];
+const processResourceList: ProcessResource[] = [];
 const watcherList = new Map<string, WatcherItem>();
 
 let processing = false;
-function listenFileChange() {
+function handleResourceChange() {
   if (processing) return;
   processing = true;
 
-  async function handleOneFile() {
-    const target = processFileList[0];
+  async function handleOneResource() {
+    const target = processResourceList[0];
     if (!target) {
       processing = false;
       return;
     }
 
-    const { action, libraryId, filePath } = target;
-    global.agent.logger.info(`Library [${libraryId}] file [${action}]: ${filePath}`);
+    const { action, libraryId, resourcePath } = target;
+    global.agent.logger.info(`Library [${libraryId}] resource [${action}]: ${resourcePath}`);
 
     if (action === 'add') {
       const start = Date.now();
-      global.agent.logger.info(`Analyse file start: ${filePath}`);
+      global.agent.logger.info(`Analyse resource start: ${resourcePath}`);
       try {
-        const fileInfo = await analyseFile(filePath);
-        global.agent.logger.info(`Analyse file success [${Date.now() - start}ms]: ${filePath}`);
+        const resourceInfo = await analyseResource(resourcePath);
+        global.agent.logger.info(`Analyse resource success [${Date.now() - start}ms]: ${resourcePath}`);
         global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
           action,
           libraryId,
-          filePath,
-          fileInfo,
+          resourcePath,
+          resourceInfo,
         });
       } catch (e) {
-        global.agent.logger.info(`Analyse file error [${Date.now() - start}ms]: ${filePath}`);
+        global.agent.logger.info(`Analyse resource error [${Date.now() - start}ms]: ${resourcePath}`);
         global.agent.logger.error(e);
       }
     }
@@ -64,21 +64,20 @@ function listenFileChange() {
       global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
         action,
         libraryId,
-        filePath,
-        fileInfo: null,
+        resourcePath,
+        resourceInfo: null,
       });
     }
 
-    processFileList.shift();
-    handleOneFile();
+    processResourceList.shift();
+    handleOneResource();
   }
 
-  handleOneFile();
+  handleOneResource();
 }
 
 /**
- * add watcher for all library
- * @param libraryList 
+ * add watcher for all libraries
  */
 function handleAllLibrary(libraryList: LibraryModel[]) {
   libraryList.forEach(item => {
@@ -92,14 +91,14 @@ function handleAllLibrary(libraryList: LibraryModel[]) {
     watcher
       .on('add', path => {
         if (isImage(path)) {
-          processFileList.push({ action: 'add', libraryId: id, filePath: path });
-          listenFileChange();
+          processResourceList.push({ action: 'add', libraryId: id, resourcePath: path });
+          handleResourceChange();
         }
       })
       .on('unlink', path => {
         if (isImage(path)) {
-          processFileList.push({ action: 'unlink', libraryId: id, filePath: path });
-          listenFileChange();
+          processResourceList.push({ action: 'unlink', libraryId: id, resourcePath: path });
+          handleResourceChange();
         }
       });
 
@@ -118,10 +117,10 @@ function handleAllLibrary(libraryList: LibraryModel[]) {
 }
 
 /**
- * TODO: list library all image file and analyse it
+ * TODO: 递归处理资料库中的所有文件
  * @param libraryInfo 
  */
-function listLibraryAllFile(libraryInfo: LibraryModel) {
+function handleLibraryAllResource(libraryInfo: LibraryModel) {
   console.log(1111, libraryInfo);
   // 遍历每个文件夹
   // 分析每个图片文件
@@ -136,6 +135,6 @@ export default (agent: Agent) => {
   });
 
   agent.messenger.on(IPC_APP_LIBRARY_SCAN, (libraryInfo: LibraryModel) => {
-    listLibraryAllFile(libraryInfo);
+    handleLibraryAllResource(libraryInfo);
   });
 };

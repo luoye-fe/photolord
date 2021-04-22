@@ -19,70 +19,68 @@ export default class ApiResourceService {
   @InjectEntityModel(ResourceExifModel)
   private resourceExifModel: Repository<ResourceExifModel>;
 
-  private processFileMap = new Map<number, IResourceActionResult[]>();
+  private processResourceMap = new Map<number, IResourceActionResult[]>();
   private processIngMap = new Map<number, boolean>();
 
-  private queueHandleFile(id: number) {
+  private queueHandleResource(id: number) {
     if (this.processIngMap.get(id)) return;
     this.processIngMap.set(id, true);
 
-    // update library analyse status
     this.libraryModel.update(id, {
       analyse_ing: 1,
     });
 
-    const handOneFile = async () => {
-      const processFileList = this.processFileMap.get(id);
-      const target = processFileList[0];
+    const handOneResource = async () => {
+      const processResourceList = this.processResourceMap.get(id);
+      const target = processResourceList[0];
       if (!target) {
         this.processIngMap.set(id, false);
 
-        // update library analyse status
         this.libraryModel.update(id, {
           analyse_ing: 0,
         });
         return;
       }
 
-      const { action, libraryId, fileInfo, filePath } = target;
+      const { action, libraryId, resourceInfo, resourcePath } = target;
 
       const { path: libraryPath } = await this.libraryModel.findOne({
         id: libraryId,
       });
 
-      const resourceRelativePath = path.relative(libraryPath, filePath);
+      const resourceRelativePath = path.relative(libraryPath, resourcePath);
 
       if (action === 'add') {
         await this.resourceModel.save({
-          md5: fileInfo.md5,
+          md5: resourceInfo.md5,
           path: resourceRelativePath,
           library_id: libraryId,
-          format: fileInfo.format,
-          name: fileInfo.name,
-          size: fileInfo.size,
-          width: fileInfo.width,
-          height: fileInfo.height,
-          create_date: fileInfo.createDate,
-          modify_date: fileInfo.modifyDate,
+          format: resourceInfo.format,
+          name: resourceInfo.name,
+          size: resourceInfo.size,
+          width: resourceInfo.width,
+          height: resourceInfo.height,
+          create_date: resourceInfo.createDate,
+          modify_date: resourceInfo.modifyDate,
           gmt_create: new Date(),
           gmt_modified: new Date(),
         });
 
-        await this.insertExif(fileInfo.md5, fileInfo.exif);
+        await this.insertResourceExif(resourceInfo.md5, resourceInfo.exif);
       }
 
       if (action === 'unlink') {
-        await this.remove(libraryId, resourceRelativePath);
+        await this.removeLibrary(libraryId, resourceRelativePath);
       }
 
-      processFileList.shift();
-      handOneFile.call(this);
+      processResourceList.shift();
+      handOneResource.call(this);
     };
 
-    handOneFile();
+    handOneResource();
   }
 
-  public async insertExif(md5: string, exif: IPlainObject) {
+  private async insertResourceExif(md5: string, exif: IPlainObject) {
     const exifList = Object.keys(exif).map(key => ({
       md5,
       key,
@@ -101,7 +99,7 @@ export default class ApiResourceService {
     } catch(e) {} // eat all conflict error
   }
 
-  public async remove(libraryId: number, path: string) {
+  private async removeLibrary(libraryId: number, path: string) {
     const resourceDetail = await this.resourceModel.findOne({
       library_id: libraryId,
       path,
@@ -112,7 +110,7 @@ export default class ApiResourceService {
         md5: resourceDetail.md5,
       });
   
-      // same md5 resource only one, remove all resource exif
+      // same MD5 resource only appear once, delete its exif info
       if (sameMd5ResourceCount === 1) await this.resourceExifModel.delete({ md5: resourceDetail.md5 });
     }
 
@@ -122,16 +120,21 @@ export default class ApiResourceService {
     });
   }
 
-  // queue handle all file action
-  public handle(resourceActionInfo: IResourceActionResult) {
+  /**
+   * push resource to queue list
+   */
+  public handleResource(resourceActionInfo: IResourceActionResult) {
     const { libraryId } = resourceActionInfo;
-    const currentLibraryList = this.processFileMap.get(libraryId);
-    if (!currentLibraryList) this.processFileMap.set(libraryId, []);
+    const currentLibraryList = this.processResourceMap.get(libraryId);
+    if (!currentLibraryList) this.processResourceMap.set(libraryId, []);
 
-    this.processFileMap.get(libraryId).push(resourceActionInfo);
-    this.queueHandleFile(libraryId);
+    this.processResourceMap.get(libraryId).push(resourceActionInfo);
+    this.queueHandleResource(libraryId);
   }
 
+  /**
+   * reset all libraries scan status
+   */
   public async resetAllLibraryScanStatus() {
     await this.libraryModel
       .createQueryBuilder()
@@ -141,6 +144,9 @@ export default class ApiResourceService {
       .execute();
   }
 
+  /**
+   * format resource info
+   */
   public formatResourceInfo(info: ResourceModel) {
     return {
       id: info.id,

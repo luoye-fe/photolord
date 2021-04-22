@@ -12,7 +12,7 @@ export class ResourceExifModel {
   id?: number;
 
   @Column('varchar', {
-    comment: 'file md5',
+    comment: 'resource md5',
   })
   md5: string;
 

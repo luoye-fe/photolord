@@ -27,8 +27,8 @@ interface IResourceInfo {
 interface IResourceActionResult {
   action: 'add' | 'unlink';
   libraryId: number;
-  filePath: string;
-  fileInfo: IResourceInfo;
+  resourcePath: string;
+  resourceInfo: IResourceInfo;
 }
 
 

@@ -19,11 +19,10 @@ export class ContainerLifeCycle implements ILifeCycle {
   resourceService: ApiResourceService;
   
   async onReady() {
-    // 重置所有库的 scan 状态
     await this.resourceService.resetAllLibraryScanStatus();
 
     global.eventInstance.on(IPC_AGENT_RESOURCE_UPDATE, (result: IResourceActionResult) => {
-      this.resourceService.handle(result);
+      this.resourceService.handleResource(result);
     });
   }
 }

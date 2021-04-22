@@ -22,13 +22,13 @@ export class ApiTranscodeController {
     const { md5, width, height } = ctx.query;
     if (!md5) return ctx.fail(400, ctx.errorCode.Params_Error);
 
-    const { path: filePath, library_id: libraryId } = await this.resourceModel.findOne({ md5 });
+    const { path: resourcePath, library_id: libraryId } = await this.resourceModel.findOne({ md5 });
 
     const { path: libraryPath } = await this.libraryModel.findOne({
       id: libraryId,
     });
 
-    const fileAbsolutePath = path.join(libraryPath, filePath);
+    const resourceAbsolutePath = path.join(libraryPath, resourcePath);
     const resizeOptions: sharp.ResizeOptions = {};
 
     if (width && !height) {
@@ -52,7 +52,7 @@ export class ApiTranscodeController {
     }
 
     ctx.response.type = 'image/jpeg';
-    ctx.body = await sharp(fileAbsolutePath)
+    ctx.body = await sharp(resourceAbsolutePath)
       .resize(resizeOptions)
       .toFormat('jpeg', { force: true })
       .toBuffer();

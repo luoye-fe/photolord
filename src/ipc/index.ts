@@ -3,7 +3,7 @@ import { LibraryModel } from '@/entity/library';
 import { IPC_APP_LIBRARY_SCAN, IPC_APP_LIBRARY_UPDATE } from '@/ipc/channel';
 
 /**
- * when app launch or library update (create & delete), publish message to agent with all library
+ * send library update message to agent
  * @param app
  */
 export async function publishLibraryUpdateMessage() {
@@ -14,7 +14,7 @@ export async function publishLibraryUpdateMessage() {
 }
 
 /**
- * publish library scan message
+ * send library scan message to agent
  */
 export async function publishLibraryScanMessage(libraryInfo: LibraryModel) {
   global.app.messenger.sendToAgent(IPC_APP_LIBRARY_SCAN, libraryInfo);

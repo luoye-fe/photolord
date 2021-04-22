@@ -39,33 +39,33 @@ function formatExif(exif: IPlainObject) {
   return result;
 }
 
-export function isImage(filePath: string) {
-  return IMAGE_EXTENSIONS.find(i => i === path.extname(filePath).slice(1).toLowerCase());
+export function isImage(resourcePath: string) {
+  return IMAGE_EXTENSIONS.find(i => i === path.extname(resourcePath).slice(1).toLowerCase());
 }
 
-export async function analyseFile(filePath: string): Promise<IResourceInfo> {
-  const fileIsExists = fse.existsSync(filePath);
-  if (!fileIsExists) throw new Error('file is not exists');
-  if (!isImage(filePath)) throw new Error('file is not image');
+export async function analyseResource(resourcePath: string): Promise<IResourceInfo> {
+  const resourceIsExists = fse.existsSync(resourcePath);
+  if (!resourceIsExists) throw new Error('resource is not exists');
+  if (!isImage(resourcePath)) throw new Error('resource is not image');
 
-  const metaData = await sharp(filePath).metadata();
+  const metaData = await sharp(resourcePath).metadata();
 
-  const fileBufferData = fse.readFileSync(filePath);
+  const resourceBufferData = fse.readFileSync(resourcePath);
 
   let exifInfo = null;
   try {
-    exifInfo = await exifr.parse(fileBufferData);
+    exifInfo = await exifr.parse(resourceBufferData);
   } catch (e) {
-    global.agent.logger.info(`Get resource exif error, does not affect the main process, ${filePath}`);
+    global.agent.logger.info(`Get resource exif error, does not affect the main process, ${resourcePath}`);
     global.agent.logger.error(e);
   }
-  const md5 = md5Buffer(fileBufferData);
-  const stat = fse.statSync(filePath);
+  const md5 = md5Buffer(resourceBufferData);
+  const stat = fse.statSync(resourcePath);
 
   return {
     md5,
-    name: path.basename(filePath),
-    path: filePath,
+    name: path.basename(resourcePath),
+    path: resourcePath,
     format: metaData.format.toUpperCase(),
     size: stat.size,
     width: metaData.width,

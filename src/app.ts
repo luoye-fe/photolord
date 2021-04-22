@@ -25,9 +25,7 @@ export default class Boot implements IBoot {
   async didReady() {
     await publishLibraryUpdateMessage();
 
-    // listen resource result from agent, update to database
     this.app.messenger.on(IPC_AGENT_RESOURCE_UPDATE, (result: IResourceActionResult) => {
-      // egg app.js cant use midway service, emit to midway configuration
       this.event.emit(IPC_AGENT_RESOURCE_UPDATE, result);
     });
   }
@@ -36,3 +34,11 @@ export default class Boot implements IBoot {
     console.log('✅ APP launched');
   }
 }
+
+/**
+ * 库更新时 -> 发送更新事件到 AGENT -> AGENT watch 所有资料库
+ * 
+ * 文件更新时 -> AGENT 捕获添加或删除事件 -> 分析文件 -> 发送文件详情到 APP -> APP 通知 midway CONFIGURATION -> 调用 resource service -> 更新库
+ * 
+ * 主动扫描时 -> 发送扫描时间到 AGENT -> 递归列出资料库的所有文件 -> 逐个分析文件 -> 发送文件详情到 APP -> APP 通知 midway CONFIGURATION -> 调用 resource service -> 更新库
+ */

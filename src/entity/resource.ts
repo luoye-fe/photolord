@@ -11,17 +11,17 @@ export class ResourceModel {
   id?: number;
 
   @Column('varchar', {
-    comment: 'file md5',
+    comment: 'resource md5',
   })
   md5: string;
 
   @Column('text', {
-    comment: 'file relative path',
+    comment: 'resource relative path',
   })
   path: string;
 
   @Column('varchar', {
-    comment: 'file name',
+    comment: 'resource name',
   })
   name: string;
 
@@ -41,17 +41,17 @@ export class ResourceModel {
   height: number;
 
   @Column('integer', {
-    comment: 'file size B',
+    comment: 'resource size B',
   })
   size: number;
 
   @Column('datetime', {
-    comment: 'file create date',
+    comment: 'resource create date',
   })
   create_date: Date;
 
   @Column('datetime', {
-    comment: 'file modify date',
+    comment: 'resource modify date',
   })
   modify_date: Date;
 
