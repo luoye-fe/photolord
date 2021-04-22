@@ -35,9 +35,4 @@ export default class Boot implements IBoot {
   async serverDidReady(): Promise<void> {
     console.log('✅ APP launched');
   }
-
-  async beforeClose() {
-    // TODO: tell agent close all watch 
-    this.app.messenger.sendToAgent('app_close', {});
-  }
 }

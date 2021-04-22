@@ -132,6 +132,15 @@ export default class ApiResourceService {
     this.queueHandleFile(libraryId);
   }
 
+  public async resetAllLibraryScanStatus() {
+    await this.libraryModel
+      .createQueryBuilder()
+      .update(LibraryModel)
+      .set({ analyse_ing: 0 })
+      .where('id LIKE :id', { id: '%' })
+      .execute();
+  }
+
   public formatResourceInfo(info: ResourceModel) {
     return {
       id: info.id,

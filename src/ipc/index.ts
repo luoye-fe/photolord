@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm';
 import { LibraryModel } from '@/entity/library';
-import { IPC_AGENT_LIBRARY_SCAN, IPC_APP_LIBRARY_UPDATE } from '@/ipc/channel';
+import { IPC_APP_LIBRARY_SCAN, IPC_APP_LIBRARY_UPDATE } from '@/ipc/channel';
 
 /**
  * when app launch or library update (create & delete), publish message to agent with all library
@@ -17,5 +17,5 @@ export async function publishLibraryUpdateMessage() {
  * publish library scan message
  */
 export async function publishLibraryScanMessage(libraryInfo: LibraryModel) {
-  global.app.messenger.sendToAgent(IPC_AGENT_LIBRARY_SCAN, libraryInfo);
+  global.app.messenger.sendToAgent(IPC_APP_LIBRARY_SCAN, libraryInfo);
 }

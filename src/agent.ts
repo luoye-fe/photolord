@@ -3,7 +3,7 @@ import 'tsconfig-paths/register';
 import { Agent } from 'egg';
 import * as chokidar from 'chokidar';
 
-import { IPC_APP_LIBRARY_UPDATE, IPC_AGENT_RESOURCE_UPDATE, IPC_AGENT_LIBRARY_SCAN } from '@/ipc/channel';
+import { IPC_APP_LIBRARY_UPDATE, IPC_AGENT_RESOURCE_UPDATE, IPC_APP_LIBRARY_SCAN } from '@/ipc/channel';
 import { LibraryModel } from '@/entity/library';
 import { isImage, analyseFile } from '@/utils/resource';
 
@@ -123,6 +123,9 @@ function handleAllLibrary(libraryList: LibraryModel[]) {
  */
 function listLibraryAllFile(libraryInfo: LibraryModel) {
   console.log(1111, libraryInfo);
+  // 遍历每个文件夹
+  // 分析每个图片文件
+  // 发出分析完成事件
 }
 
 export default (agent: Agent) => {
@@ -132,7 +135,7 @@ export default (agent: Agent) => {
     handleAllLibrary(libraryList);
   });
 
-  agent.messenger.on(IPC_AGENT_LIBRARY_SCAN, (libraryInfo: LibraryModel) => {
+  agent.messenger.on(IPC_APP_LIBRARY_SCAN, (libraryInfo: LibraryModel) => {
     listLibraryAllFile(libraryInfo);
   });
 };
