@@ -87,7 +87,16 @@
   transition: all ease 0.3s;
 }
 
+.library-action-menu-item-disable {
+  color: hsla(0, 0%, 100%, 0.3);
+}
+
 .library-action-menu-item:hover {
   background-color: hsla(0, 0%, 100%, 0.08);
   color: #fff;
+}
+
+.library-action-menu-item-disable:hover {
+  background-color: #191a1c;
+  color: hsla(0, 0%, 100%, 0.3);
 }
