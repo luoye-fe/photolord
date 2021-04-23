@@ -3,7 +3,7 @@ import { message } from 'antd';
 import dayjs from 'dayjs';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-import FileItem from '@/components/FileItem';
+import ResourceItem from '@/components/ResourceItem';
 import ListTitle from '@/components/ListTitle';
 import fetch from '@/common/fetch';
 
@@ -92,7 +92,7 @@ const TimelineTab = (props: PropsType) => {
       {Object.keys(photoListByDay).map(day => (
         <div key={day}>
           <ListTitle text={day} />
-          {photoListByDay[day].map(item => <FileItem key={item.id} photo={item} />)}
+          {photoListByDay[day].map(item => <ResourceItem key={item.id} photo={item} />)}
         </div>
       ))}
     </InfiniteScroll>

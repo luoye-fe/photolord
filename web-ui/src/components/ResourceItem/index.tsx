@@ -12,7 +12,7 @@ interface PropsType {
   photo: PhotoInfo;
 }
 
-const FileItem = (props: PropsType) => {
+const ResourceItem = (props: PropsType) => {
   const { photo } = props;
   const { width, height } = photo;
 
@@ -55,11 +55,11 @@ const FileItem = (props: PropsType) => {
   }, []);
 
   return (
-    <div className={styles.file}>
-      <div ref={containerElement} className={classnames([styles['file-main']])} style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}>
-        {imageSrc && <img ref={imageElement} className={classnames(styles['file-image'], !loading && styles['file-image-show'])} src={imageSrc} />}
-        <div className={styles['file-action-container']}>
-          <div className={styles['file-action-icons']}>
+    <div className={styles.resource}>
+      <div ref={containerElement} className={classnames([styles['resource-main']])} style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}>
+        {imageSrc && <img ref={imageElement} className={classnames(styles['resource-image'], !loading && styles['resource-image-show'])} src={imageSrc} />}
+        <div className={styles['resource-action-container']}>
+          <div className={styles['resource-action-icons']}>
             <i className={classnames([styles['icon-point'], iconStyles['iconfont'], iconStyles['icon-point']])} />
           </div>
         </div>
@@ -68,4 +68,4 @@ const FileItem = (props: PropsType) => {
   );
 };
 
-export default FileItem;
+export default ResourceItem;

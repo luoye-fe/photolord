@@ -1,9 +1,9 @@
-.file {
+.resource {
   display: inline-block;
   padding: 4px;
 }
 
-.file-main {
+.resource-main {
   border-radius: 6px;
   overflow: hidden;
   background-color: rgba(0, 0, 0, 0.3);
@@ -12,7 +12,7 @@
   position: relative;
 }
 
-.file-action-container {
+.resource-action-container {
   opacity: 0;
   transition: opacity ease 0.3s;
   position: absolute;
@@ -27,10 +27,10 @@
   justify-content: flex-end;
 }
 
-.file-main:hover {
+.resource-main:hover {
   box-shadow: 0 0 0 1px #e5a00d, 0 0 4px rgb(0 0 0 / 30%);
 
-  .file-action-container {
+  .resource-action-container {
     background:
       radial-gradient(
         farthest-corner at 50% 50%,
@@ -41,7 +41,7 @@
   }
 }
 
-.file-action-icons {
+.resource-action-icons {
   display: flex;
 }
 
@@ -49,11 +49,11 @@
   color: hsla(0, 0%, 100%, 0.75);
 }
 
-.file-image {
+.resource-image {
   opacity: 0;
   transition: opacity ease 0.3s;
 }
 
-.file-image-show {
+.resource-image-show {
   opacity: 1;
 }
