@@ -67,6 +67,7 @@ const LibraryList = () => {
 
     const handle = async () => {
       const list = await getLibraryList(true);
+      setLibraryList(list);
 
       // all library not scanning, stop auto update
       if (!list.find(i => i.analyseIng === 1)) {
