@@ -10,5 +10,4 @@ export const IMAGE_EXTENSIONS = [
   'heif',
   'raw',
   'cr2',
-  'pdf',
 ];
