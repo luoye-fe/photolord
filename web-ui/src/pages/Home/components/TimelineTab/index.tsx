@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -6,6 +6,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import ResourceItem from '@/components/ResourceItem';
 import ListTitle from '@/components/ListTitle';
 import fetch from '@/common/fetch';
+import { getItemSuitableHeight } from '@/common/util';
 
 import RootContext from '@/store/context';
 import { RootReducerActionType } from '@/store/type';
@@ -19,12 +20,14 @@ interface PropsType {
 
 const TimelineTab = (props: PropsType) => {
   const size = 50;
-  const scrollableTarget = document.getElementById('main-container');
   const [loading, setLoading] = useState(false);
   const [photoListByDay, setPhotoListByDay] = useState<{ [key: string]: PhotoInfo[] }>({});
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [hasLoadCount, setHasLoadCount] = useState(0);
+
+  const itemHeight = useMemo(() => getItemSuitableHeight(), []);
+  const scrollableTarget = useMemo(() => document.getElementById('main-container'), []);
 
   const {
     dispatch,
@@ -92,7 +95,7 @@ const TimelineTab = (props: PropsType) => {
       {Object.keys(photoListByDay).map(day => (
         <div key={day}>
           <ListTitle text={day} />
-          {photoListByDay[day].map(item => <ResourceItem key={item.id} photo={item} />)}
+          {photoListByDay[day].map(item => <ResourceItem key={item.id} photo={item} itemHeight={itemHeight} />)}
         </div>
       ))}
     </InfiniteScroll>

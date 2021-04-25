@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { config } from 'ice';
 import classnames from 'classnames';
-import { getItemSuitableHeight } from '@/common/util';
 
 import styles from './index.module.scss';
 import iconStyles from '@/common/iconfont.module.scss';
@@ -10,15 +9,15 @@ const { baseURL } = config;
 
 interface PropsType {
   photo: PhotoInfo;
+  itemHeight?: number;
 }
 
 const ResourceItem = (props: PropsType) => {
-  const { photo } = props;
+  const { photo, itemHeight = 100 } = props;
   const { width, height } = photo;
 
-  const imageHeight = getItemSuitableHeight();
-  const imageWidth = width / height * imageHeight;
-  const imageResultUrl = `${baseURL}/transcode?md5=${photo.md5}&height=${imageHeight}`;
+  const imageWidth = width / height * itemHeight;
+  const imageResultUrl = `${baseURL}/transcode?md5=${photo.md5}&height=${itemHeight}`;
 
   const [loading, setLoading] = useState(true);
   const [imageSrc, setImageSrc] = useState('');
@@ -56,7 +55,7 @@ const ResourceItem = (props: PropsType) => {
 
   return (
     <div className={styles.resource}>
-      <div ref={containerElement} className={classnames([styles['resource-main']])} style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}>
+      <div ref={containerElement} className={classnames([styles['resource-main']])} style={{ width: `${imageWidth}px`, height: `${itemHeight}px` }}>
         {imageSrc && <img ref={imageElement} className={classnames(styles['resource-image'], !loading && styles['resource-image-show'])} src={imageSrc} />}
         <div className={styles['resource-action-container']}>
           <div className={styles['resource-action-icons']}>
