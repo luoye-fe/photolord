@@ -28,9 +28,7 @@ interface IResourceActionResult {
   action: 'add' | 'unlink';
   libraryId: number;
   resourcePath: string;
-  resourceInfo: IResourceInfo;
 }
-
 
 declare global {
   namespace NodeJS {

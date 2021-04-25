@@ -11,6 +11,7 @@ import { IPlainObject, IResourceInfo } from '@/typings';
 
 function formatExif(exif: IPlainObject) {
   const result = {};
+  if (!exif) return result;
 
   for (const key in exif) {
     if (Object.prototype.hasOwnProperty.call(exif, key)) {
@@ -45,20 +46,26 @@ export function isImage(resourcePath: string) {
 
 export async function analyseResource(resourcePath: string): Promise<IResourceInfo> {
   const resourceIsExists = fse.existsSync(resourcePath);
-  if (!resourceIsExists) throw new Error('resource is not exists');
-  if (!isImage(resourcePath)) throw new Error('resource is not image');
+  if (!resourceIsExists) throw new Error('Resource is not exists');
+  if (!isImage(resourcePath)) throw new Error('Resource is not image');
 
-  const metaData = await sharp(resourcePath).metadata();
+  let metaData = null;
+  try {
+    metaData = await sharp(resourcePath).metadata();
+  } catch (e) {
+    global.agent.logger.info(`Sharp resource metadata error, does not affect the main process, ${resourcePath}`);
+  }
 
-  const resourceBufferData = fse.readFileSync(resourcePath);
+  if (!metaData) return null;
 
   let exifInfo = null;
+  const resourceBufferData = fse.readFileSync(resourcePath);
   try {
     exifInfo = await exifr.parse(resourceBufferData);
   } catch (e) {
     global.agent.logger.info(`Get resource exif error, does not affect the main process, ${resourcePath}`);
-    global.agent.logger.error(e);
   }
+
   const md5 = md5Buffer(resourceBufferData);
   const stat = fse.statSync(resourcePath);
 

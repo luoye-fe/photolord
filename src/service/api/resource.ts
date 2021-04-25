@@ -3,6 +3,8 @@ import { Provide } from '@midwayjs/decorator';
 import { InjectEntityModel } from '@midwayjs/orm';
 import { Repository } from 'typeorm';
 
+import ResourceQueue from '@/utils/resourceQueue';
+import { analyseResource } from '@/utils/resource';
 import { LibraryModel } from '@/entity/library';
 import { ResourceModel } from '@/entity/resource';
 import { ResourceExifModel } from '@/entity/resource_exif';
@@ -19,65 +21,63 @@ export default class ApiResourceService {
   @InjectEntityModel(ResourceExifModel)
   private resourceExifModel: Repository<ResourceExifModel>;
 
-  private processResourceMap = new Map<number, IResourceActionResult[]>();
-  private processIngMap = new Map<number, boolean>();
+  private queueInstance = new ResourceQueue();
 
-  private queueHandleResource(id: number) {
-    if (this.processIngMap.get(id)) return;
-    this.processIngMap.set(id, true);
+  constructor() {
+    this.queueInstance.setCallback(this._handleResource.bind(this));
 
-    this.libraryModel.update(id, {
-      analyse_ing: 1,
+    // queue start
+    this.queueInstance.onStart((id) => {
+      this.libraryModel.update(id, { analyse_ing: 1 });
     });
 
-    const handOneResource = async () => {
-      const processResourceList = this.processResourceMap.get(id);
-      const target = processResourceList[0];
-      if (!target) {
-        this.processIngMap.set(id, false);
+    // queue finish
+    this.queueInstance.onFinish((id) => {
+      this.libraryModel.update(id, { analyse_ing: 0 });
+    });
+  }
 
-        this.libraryModel.update(id, {
-          analyse_ing: 0,
-        });
-        return;
-      }
+  private async _handleResource(target: IResourceActionResult) {
+    const { action, libraryId, resourcePath } = target;
 
-      const { action, libraryId, resourceInfo, resourcePath } = target;
+    const { path: libraryPath } = await this.libraryModel.findOne({ id: libraryId });
+    const resourceRelativePath = path.relative(libraryPath, resourcePath);
 
-      const { path: libraryPath } = await this.libraryModel.findOne({
-        id: libraryId,
-      });
+    if (action === 'add') {
+      // analyze image resource
+      const resourceInfo = await analyseResource(resourcePath);
+      if (!resourceInfo) return;
 
-      const resourceRelativePath = path.relative(libraryPath, resourcePath);
+      // update or save
+      try {
+        await this.resourceExifModel
+          .createQueryBuilder()
+          .insert()
+          .into(ResourceModel)
+          .values({
+            md5: resourceInfo.md5,
+            path: resourceRelativePath,
+            library_id: libraryId,
+            format: resourceInfo.format,
+            name: resourceInfo.name,
+            size: resourceInfo.size,
+            width: resourceInfo.width,
+            height: resourceInfo.height,
+            create_date: resourceInfo.createDate,
+            modify_date: resourceInfo.modifyDate,
+            gmt_create: new Date(),
+            gmt_modified: new Date(),
+          })
+          .execute();
+      } catch (e) { } // eat all conflict error
 
-      if (action === 'add') {
-        await this.resourceModel.save({
-          md5: resourceInfo.md5,
-          path: resourceRelativePath,
-          library_id: libraryId,
-          format: resourceInfo.format,
-          name: resourceInfo.name,
-          size: resourceInfo.size,
-          width: resourceInfo.width,
-          height: resourceInfo.height,
-          create_date: resourceInfo.createDate,
-          modify_date: resourceInfo.modifyDate,
-          gmt_create: new Date(),
-          gmt_modified: new Date(),
-        });
+      // insert image exif
+      await this.insertResourceExif(resourceInfo.md5, resourceInfo.exif);
+    }
 
-        await this.insertResourceExif(resourceInfo.md5, resourceInfo.exif);
-      }
-
-      if (action === 'unlink') {
-        await this.removeLibrary(libraryId, resourceRelativePath);
-      }
-
-      processResourceList.shift();
-      handOneResource.call(this);
-    };
-
-    handOneResource();
+    if (action === 'unlink') {
+      await this.removeLibrary(libraryId, resourceRelativePath);
+    }
   }
 
   private async insertResourceExif(md5: string, exif: IPlainObject) {
@@ -96,7 +96,7 @@ export default class ApiResourceService {
         .into(ResourceExifModel)
         .values(exifList)
         .execute();
-    } catch(e) {} // eat all conflict error
+    } catch (e) { } // eat all conflict error
   }
 
   private async removeLibrary(libraryId: number, path: string) {
@@ -109,7 +109,7 @@ export default class ApiResourceService {
       const sameMd5ResourceCount = await this.resourceModel.count({
         md5: resourceDetail.md5,
       });
-  
+
       // same MD5 resource only appear once, delete its exif info
       if (sameMd5ResourceCount === 1) await this.resourceExifModel.delete({ md5: resourceDetail.md5 });
     }
@@ -125,11 +125,8 @@ export default class ApiResourceService {
    */
   public handleResource(resourceActionInfo: IResourceActionResult) {
     const { libraryId } = resourceActionInfo;
-    const currentLibraryList = this.processResourceMap.get(libraryId);
-    if (!currentLibraryList) this.processResourceMap.set(libraryId, []);
-
-    this.processResourceMap.get(libraryId).push(resourceActionInfo);
-    this.queueHandleResource(libraryId);
+    this.queueInstance.add(libraryId, resourceActionInfo);
+    this.queueInstance.run(libraryId);
   }
 
   /**

@@ -38,7 +38,7 @@ export default class Boot implements IBoot {
 /**
  * 库更新时 -> 发送更新事件到 AGENT -> AGENT watch 所有资料库
  * 
- * 文件更新时 -> AGENT 捕获添加或删除事件 -> 分析文件 -> 发送文件详情到 APP -> APP 通知 midway CONFIGURATION -> 调用 resource service -> 更新库
+ * 文件更新时 -> AGENT 捕获添加或删除事件 -> 发送事件到 APP -> APP 通知 midway CONFIGURATION -> 调用 resource service（分析文件等） -> 更新库
  * 
  * 主动扫描时 -> 发送扫描时间到 AGENT -> 递归列出资料库的所有文件 -> 逐个分析文件 -> 发送文件详情到 APP -> APP 通知 midway CONFIGURATION -> 调用 resource service -> 更新库
  */

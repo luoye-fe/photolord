@@ -1,17 +1,14 @@
 import 'tsconfig-paths/register';
+import path from 'path';
+import fse from 'fs-extra';
 
 import { Agent } from 'egg';
 import * as chokidar from 'chokidar';
 
 import { IPC_APP_LIBRARY_UPDATE, IPC_AGENT_RESOURCE_UPDATE, IPC_APP_LIBRARY_SCAN } from '@/ipc/channel';
 import { LibraryModel } from '@/entity/library';
-import { isImage, analyseResource } from '@/utils/resource';
-
-interface ProcessResource {
-  action: 'add' | 'change' | 'unlink';
-  libraryId: number;
-  resourcePath: string;
-}
+import { isImage } from '@/utils/resource';
+import { IResourceActionResult } from './typings';
 
 interface WatcherItem extends LibraryModel {
   watcher: chokidar.FSWatcher;
@@ -24,117 +21,97 @@ const watchOptions: chokidar.WatchOptions = {
   ignored: /(^|[\/\\])\../, // ignore hidden file
 };
 
-const processResourceList: ProcessResource[] = [];
-const watcherList = new Map<string, WatcherItem>();
+class AgentBoot {
+  private watcherList = new Map<string, WatcherItem>();
 
-let processing = false;
-function handleResourceChange() {
-  if (processing) return;
-  processing = true;
+  constructor(agent: Agent) {
+    global.agent = agent;
 
-  async function handleOneResource() {
-    const target = processResourceList[0];
-    if (!target) {
-      processing = false;
-      return;
-    }
+    agent.messenger.on(IPC_APP_LIBRARY_UPDATE, (libraryList: LibraryModel[]) => {
+      this.handleAllLibrary(libraryList);
+    });
 
-    const { action, libraryId, resourcePath } = target;
-    global.agent.logger.info(`Library [${libraryId}] resource [${action}]: ${resourcePath}`);
-
-    if (action === 'add') {
-      const start = Date.now();
-      global.agent.logger.info(`Analyse resource start: ${resourcePath}`);
-      try {
-        const resourceInfo = await analyseResource(resourcePath);
-        global.agent.logger.info(`Analyse resource success [${Date.now() - start}ms]: ${resourcePath}`);
-        global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
-          action,
-          libraryId,
-          resourcePath,
-          resourceInfo,
-        });
-      } catch (e) {
-        global.agent.logger.info(`Analyse resource error [${Date.now() - start}ms]: ${resourcePath}`);
-        global.agent.logger.error(e);
-      }
-    }
-
-    if (action === 'unlink') {
-      global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
-        action,
-        libraryId,
-        resourcePath,
-        resourceInfo: null,
-      });
-    }
-
-    processResourceList.shift();
-    handleOneResource();
+    agent.messenger.on(IPC_APP_LIBRARY_SCAN, (libraryInfo: LibraryModel) => {
+      this.handleLibraryAllResource(libraryInfo);
+    });
   }
 
-  handleOneResource();
-}
-
-/**
- * add watcher for all libraries
- */
-function handleAllLibrary(libraryList: LibraryModel[]) {
-  libraryList.forEach(item => {
-    const { path: libraryPath, id } = item;
-
-    const existWatcherItem = watcherList.get(libraryPath);
-    if (existWatcherItem) return;
-
-    const watcher = chokidar.watch(libraryPath, watchOptions);
-
-    watcher
-      .on('add', path => {
-        if (isImage(path)) {
-          processResourceList.push({ action: 'add', libraryId: id, resourcePath: path });
-          handleResourceChange();
-        }
-      })
-      .on('unlink', path => {
-        if (isImage(path)) {
-          processResourceList.push({ action: 'unlink', libraryId: id, resourcePath: path });
-          handleResourceChange();
-        }
-      });
-
-    watcherList.set(libraryPath, {
-      ...item,
-      watcher,
+  private publishMessage(target: IResourceActionResult) {
+    const { action, libraryId, resourcePath } = target;
+    global.agent.logger.info(`Library [${libraryId}] resource [${action}]: ${resourcePath}`);
+    global.agent.messenger.sendToApp(IPC_AGENT_RESOURCE_UPDATE, {
+      action,
+      libraryId,
+      resourcePath,
     });
-  });
+  }
 
-  // close watcher and remove watchItem
-  watcherList.forEach(async (item) => {
-    if (libraryList.find(i => i.path === item.path)) return;
-    await item.watcher.close();
-    watcherList.delete(item.path);
-  });
+  /**
+   * add watcher for all libraries
+   */
+  handleAllLibrary(libraryList: LibraryModel[]) {
+    libraryList.forEach(item => {
+      const { path: libraryPath, id } = item;
+
+      const existWatcherItem = this.watcherList.get(libraryPath);
+      if (existWatcherItem) return;
+
+      const watcher = chokidar.watch(libraryPath, watchOptions);
+
+      watcher
+        .on('add', path => {
+          if (isImage(path)) {
+            this.publishMessage({ action: 'add', libraryId: id, resourcePath: path });
+          }
+        })
+        .on('unlink', path => {
+          if (isImage(path)) {
+            this.publishMessage({ action: 'unlink', libraryId: id, resourcePath: path });
+          }
+        });
+
+      this.watcherList.set(libraryPath, {
+        ...item,
+        watcher,
+      });
+    });
+
+    // close watcher and remove watchItem
+    this.watcherList.forEach(async (item) => {
+      if (libraryList.find(i => i.path === item.path)) return;
+      await item.watcher.close();
+      this.watcherList.delete(item.path);
+    });
+  }
+
+  /**
+   * recursive all dir
+   * @param libraryInfo 
+   */
+  handleLibraryAllResource(libraryInfo: LibraryModel) {
+    const { path: libraryPath, id } = libraryInfo;
+
+    const handleOneDir = async (currentDir: string) => {
+      const files = await fse.readdir(currentDir);
+
+      for (let i = 0; i < files.length; i += 1) {
+        const current = files[i];
+        const currentPath = path.join(currentDir, current);
+
+        const stat = await fse.stat(currentPath);
+
+        if (stat.isFile() && isImage(currentPath)) {
+          this.publishMessage({ action: 'add', libraryId: id, resourcePath: currentPath });
+        }
+
+        if (stat.isDirectory()) {
+          handleOneDir(currentPath);
+        }
+      }
+    };
+
+    handleOneDir(libraryPath);
+  }
 }
 
-/**
- * TODO: 递归处理资料库中的所有文件
- * @param libraryInfo 
- */
-function handleLibraryAllResource(libraryInfo: LibraryModel) {
-  console.log(1111, libraryInfo);
-  // 遍历每个文件夹
-  // 分析每个图片文件
-  // 发出分析完成事件
-}
-
-export default (agent: Agent) => {
-  global.agent = agent;
-
-  agent.messenger.on(IPC_APP_LIBRARY_UPDATE, (libraryList: LibraryModel[]) => {
-    handleAllLibrary(libraryList);
-  });
-
-  agent.messenger.on(IPC_APP_LIBRARY_SCAN, (libraryInfo: LibraryModel) => {
-    handleLibraryAllResource(libraryInfo);
-  });
-};
+export default (agent: Agent) => new AgentBoot(agent);
