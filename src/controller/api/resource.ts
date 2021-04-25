@@ -6,6 +6,7 @@ import { LibraryModel } from '@/entity/library';
 import { ResourceModel } from '@/entity/resource';
 import ResourceService from '@/service/api/resource';
 import { Context } from 'node:vm';
+import { IResourceInfo } from '@/typings';
 
 @Provide()
 @Controller('/api/resource', {
@@ -22,6 +23,28 @@ export class ApiResourceController {
 
   @Inject()
   resourceService: ResourceService;
+
+  @Get('/list')
+  async list(ctx: Context) {
+    const { page = '1', size = '10', id, path: relativePath = '' } = ctx.query;
+    if (!id || !relativePath || (relativePath !== '/' && !/^\/.*\/$/.test(relativePath))) return ctx.fail(400, ctx.errorCode.Params_Error);
+
+    const nPage = Number(page);
+    const nSize = Number(size);
+
+
+    const [ allResource, allDirectory ] = await Promise.all([this.findAllResourceByPath(relativePath), this.findAllDirectoryByPath(relativePath)]);
+
+    const formattedResourceList = this.formatResourceList(allResource);
+    const formattedDirectoryList = this.formatDirectoryList(allDirectory);
+    const concatList: any = formattedDirectoryList.concat(formattedResourceList as any);
+
+    ctx.success({
+      page: nPage,
+      size: nSize,
+      list: concatList.slice(0, page * size),
+    });
+  }
 
   @Get('/timeline')
   async timeline(ctx: Context) {
@@ -46,6 +69,70 @@ export class ApiResourceController {
       count,
       hasMore: count > page * size,
       list: result.map(this.resourceService.formatResourceInfo),
+    });
+  }
+
+  // find all children resource by relative path
+  private async findAllResourceByPath(relativePath: string) {
+    if (relativePath === '/') {
+      return await this.resourceModel
+        .createQueryBuilder()
+        .select('*')
+        .where('path NOT LIKE :path', { path: '%/%' })
+        .orderBy('create_date', 'DESC')
+        .execute();
+    } else {
+      relativePath = relativePath.replace(/^\//, '');
+      return await this.resourceModel.createQueryBuilder()
+        .select('*')
+        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: `${relativePath}/%`, pathTwo: `${relativePath}/%/%` })
+        .orderBy('create_date', 'DESC')
+        .execute();
+    }
+  }
+
+  // find all children directory by relative path
+  private async findAllDirectoryByPath(relativePath: string) {
+    if (relativePath === '/') {
+      return await this.resourceModel
+        .createQueryBuilder()
+        .select('*')
+        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: '%/%', pathTwo: '%/%/%' })
+        .orderBy('create_date', 'DESC')
+        .execute();
+    } else {
+      relativePath = relativePath.replace(/^\//, '');
+      return await this.resourceModel.createQueryBuilder()
+        .select('*')
+        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: `${relativePath}/%/%`, pathTwo: `${relativePath}/%/%/%` })
+        .orderBy('create_date', 'DESC')
+        .execute();
+    }
+  }
+
+  private formatResourceList(resourceList: IResourceInfo[]) {
+    return resourceList.map(item => ({
+      type: 'resource',
+      resourceInfo: item,
+    }));
+  }
+
+  private formatDirectoryList(directoryList: IResourceInfo[]) {
+    const tempMap = {};
+
+    directoryList.forEach(item => {
+      const dirName = item.path.replace(/\/.*/, '');
+      if (!tempMap[dirName]) tempMap[dirName] = [];
+      tempMap[dirName].push(item);
+    });
+
+    return Object.keys(tempMap).map(key => {
+      const currentDirResourceList = tempMap[key];
+      return {
+        type: 'directory',
+        dirName: key,
+        preview: currentDirResourceList.slice(0, 4),
+      };
     });
   }
 }

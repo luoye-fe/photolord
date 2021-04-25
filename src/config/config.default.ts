@@ -18,7 +18,7 @@ export default (appInfo: EggAppInfo): DefaultConfig => {
     type: 'sqlite',
     database: path.join(appInfo.baseDir, '../db/database.sqlite'),
     synchronize: true,
-    logging: false,
+    logging: true,
   };
 
   config.cors = {
