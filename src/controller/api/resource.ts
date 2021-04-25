@@ -23,8 +23,8 @@ export class ApiResourceController {
   @Inject()
   resourceService: ResourceService;
 
-  @Get('/list')
-  async list(ctx: Context) {
+  @Get('/timeline')
+  async timeline(ctx: Context) {
     const { page = '1', size = '10' } = ctx.query;
 
     const nPage = Number(page);

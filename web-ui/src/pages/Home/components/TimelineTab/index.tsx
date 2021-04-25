@@ -45,7 +45,7 @@ const TimelineTab = (props: PropsType) => {
     }
 
     fetch({
-      url: '/resource/list',
+      url: '/resource/timeline',
       params: {
         page,
         size,
