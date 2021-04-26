@@ -8,7 +8,7 @@ import { analyseResource } from '@/utils/resource';
 import { LibraryModel } from '@/entity/library';
 import { ResourceModel } from '@/entity/resource';
 import { ResourceExifModel } from '@/entity/resource_exif';
-import { IPlainObject, IResourceActionResult } from '@/typings';
+import { IPlainObject, IResourceActionResult, IResourceInfo } from '@/typings';
 
 @Provide()
 export default class ApiResourceService {
@@ -144,7 +144,7 @@ export default class ApiResourceService {
   /**
    * format resource info
    */
-  public formatResourceInfo(info: ResourceModel) {
+  public formatResourceInfo(info: ResourceModel): IResourceInfo {
     return {
       id: info.id,
       libraryId: info.library_id,

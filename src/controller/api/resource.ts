@@ -6,7 +6,20 @@ import { LibraryModel } from '@/entity/library';
 import { ResourceModel } from '@/entity/resource';
 import ResourceService from '@/service/api/resource';
 import { Context } from 'node:vm';
-import { IResourceInfo } from '@/typings';
+import { IResourceAnalyseResult, IResourceInfo } from '@/typings';
+
+type TreeResourceItem = {
+  type: 'resource';
+  resourceInfo: IResourceInfo;
+};
+
+type TreeDirectoryItem = {
+  type: 'directory';
+  dirName: string;
+  preview: IResourceInfo[];
+};
+
+type TreeItem = TreeResourceItem | TreeDirectoryItem;
 
 @Provide()
 @Controller('/api/resource', {
@@ -24,7 +37,7 @@ export class ApiResourceController {
   @Inject()
   resourceService: ResourceService;
 
-  @Get('/list')
+  @Get('/tree')
   async list(ctx: Context) {
     const { page = '1', size = '10', id, path: relativePath = '' } = ctx.query;
     if (!id || !relativePath || (relativePath !== '/' && !/^\/.*\/$/.test(relativePath))) return ctx.fail(400, ctx.errorCode.Params_Error);
@@ -32,12 +45,10 @@ export class ApiResourceController {
     const nPage = Number(page);
     const nSize = Number(size);
 
-
-    const [ allResource, allDirectory ] = await Promise.all([this.findAllResourceByPath(relativePath), this.findAllDirectoryByPath(relativePath)]);
-
+    const [allResource, allDirectory] = await Promise.all([this.findAllResourceByPath(relativePath), this.findAllDirectoryByPath(relativePath)]);
     const formattedResourceList = this.formatResourceList(allResource);
     const formattedDirectoryList = this.formatDirectoryList(allDirectory);
-    const concatList: any = formattedDirectoryList.concat(formattedResourceList as any);
+    const concatList: TreeItem[] = [...formattedDirectoryList, ...formattedResourceList];
 
     ctx.success({
       page: nPage,
@@ -85,7 +96,7 @@ export class ApiResourceController {
       relativePath = relativePath.replace(/^\//, '');
       return await this.resourceModel.createQueryBuilder()
         .select('*')
-        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: `${relativePath}/%`, pathTwo: `${relativePath}/%/%` })
+        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: `${relativePath}%`, pathTwo: `${relativePath}%/%` })
         .orderBy('create_date', 'DESC')
         .execute();
     }
@@ -98,30 +109,34 @@ export class ApiResourceController {
         .createQueryBuilder()
         .select('*')
         .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: '%/%', pathTwo: '%/%/%' })
-        .orderBy('create_date', 'DESC')
+        .orderBy('path', 'DESC')
         .execute();
     } else {
       relativePath = relativePath.replace(/^\//, '');
       return await this.resourceModel.createQueryBuilder()
         .select('*')
-        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: `${relativePath}/%/%`, pathTwo: `${relativePath}/%/%/%` })
-        .orderBy('create_date', 'DESC')
+        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: `${relativePath}%/%`, pathTwo: `${relativePath}%/%/%` })
+        .orderBy('path', 'DESC')
         .execute();
     }
   }
 
-  private formatResourceList(resourceList: IResourceInfo[]) {
+  private formatResourceList(resourceList: ResourceModel[]): TreeResourceItem[] {
+    if (!resourceList.length) return [];
+
     return resourceList.map(item => ({
       type: 'resource',
-      resourceInfo: item,
+      resourceInfo: this.resourceService.formatResourceInfo(item),
     }));
   }
 
-  private formatDirectoryList(directoryList: IResourceInfo[]) {
-    const tempMap = {};
+  private formatDirectoryList(directoryList: IResourceAnalyseResult[]): TreeDirectoryItem[] {
+    if (!directoryList.length) return [];
 
+    const tempMap = {};
     directoryList.forEach(item => {
-      const dirName = item.path.replace(/\/.*/, '');
+      const dirAllLayer = item.path.match(/.*?\//g);
+      const dirName = dirAllLayer[dirAllLayer.length - 1].replace(/\/$/, '');
       if (!tempMap[dirName]) tempMap[dirName] = [];
       tempMap[dirName].push(item);
     });
@@ -131,7 +146,7 @@ export class ApiResourceController {
       return {
         type: 'directory',
         dirName: key,
-        preview: currentDirResourceList.slice(0, 4),
+        preview: currentDirResourceList.slice(0, 4).map(this.resourceService.formatResourceInfo),
       };
     });
   }

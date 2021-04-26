@@ -11,7 +11,7 @@ interface IResponse {
   data: IPlainObject;
 }
 
-interface IResourceInfo {
+interface IResourceAnalyseResult {
   md5: string;
   path: string;
   name: string;
@@ -22,6 +22,20 @@ interface IResourceInfo {
   createDate: Date;
   modifyDate: Date;
   exif: IPlainObject;
+}
+
+interface IResourceInfo {
+  id: number;
+  libraryId: number;
+  md5: string;
+  path: string;
+  name: string;
+  format: string;
+  width: number;
+  height: number;
+  size: number;
+  createDate: Date;
+  modifyDate: Date;
 }
 
 interface IResourceActionResult {

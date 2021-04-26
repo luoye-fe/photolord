@@ -7,7 +7,7 @@ import exifr from 'exifr';
 import { md5Buffer } from '@/utils/index';
 
 import { IMAGE_EXTENSIONS } from '@/const/token/image';
-import { IPlainObject, IResourceInfo } from '@/typings';
+import { IPlainObject, IResourceAnalyseResult } from '@/typings';
 
 function formatExif(exif: IPlainObject) {
   const result = {};
@@ -44,7 +44,7 @@ export function isImage(resourcePath: string) {
   return IMAGE_EXTENSIONS.find(i => i === path.extname(resourcePath).slice(1).toLowerCase());
 }
 
-export async function analyseResource(resourcePath: string): Promise<IResourceInfo> {
+export async function analyseResource(resourcePath: string): Promise<IResourceAnalyseResult> {
   const resourceIsExists = fse.existsSync(resourcePath);
   if (!resourceIsExists) throw new Error('Resource is not exists');
   if (!isImage(resourcePath)) throw new Error('Resource is not image');
