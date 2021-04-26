@@ -16,6 +16,7 @@ type TreeResourceItem = {
 type TreeDirectoryItem = {
   type: 'directory';
   dirName: string;
+  path: string;
   preview: IResourceInfo[];
 };
 
@@ -39,21 +40,16 @@ export class ApiResourceController {
 
   @Get('/tree')
   async list(ctx: Context) {
-    const { page = '1', size = '10', id, path: relativePath = '' } = ctx.query;
+    const { id, path: relativePath = '' } = ctx.query;
     if (!id || !relativePath || (relativePath !== '/' && !/^\/.*\/$/.test(relativePath))) return ctx.fail(400, ctx.errorCode.Params_Error);
 
-    const nPage = Number(page);
-    const nSize = Number(size);
-
-    const [allResource, allDirectory] = await Promise.all([this.findAllResourceByPath(relativePath), this.findAllDirectoryByPath(relativePath)]);
+    const [allResource, allDirectory] = await Promise.all([this.findAllResourceByPath(id, relativePath), this.findAllDirectoryByPath(id, relativePath)]);
     const formattedResourceList = this.formatResourceList(allResource);
     const formattedDirectoryList = this.formatDirectoryList(allDirectory);
     const concatList: TreeItem[] = [...formattedDirectoryList, ...formattedResourceList];
 
     ctx.success({
-      page: nPage,
-      size: nSize,
-      list: concatList.slice(0, page * size),
+      list: concatList,
     });
   }
 
@@ -84,38 +80,38 @@ export class ApiResourceController {
   }
 
   // find all children resource by relative path
-  private async findAllResourceByPath(relativePath: string) {
+  private async findAllResourceByPath(libraryId: number, relativePath: string) {
     if (relativePath === '/') {
       return await this.resourceModel
         .createQueryBuilder()
         .select('*')
-        .where('path NOT LIKE :path', { path: '%/%' })
+        .where('library_id = :id AND path NOT LIKE :path', { id: libraryId, path: '%/%' })
         .orderBy('create_date', 'DESC')
         .execute();
     } else {
       relativePath = relativePath.replace(/^\//, '');
       return await this.resourceModel.createQueryBuilder()
         .select('*')
-        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: `${relativePath}%`, pathTwo: `${relativePath}%/%` })
+        .where('library_id = :id AND path LIKE :pathOne AND path NOT LIKE :pathTwo', { id: libraryId, pathOne: `${relativePath}%`, pathTwo: `${relativePath}%/%` })
         .orderBy('create_date', 'DESC')
         .execute();
     }
   }
 
   // find all children directory by relative path
-  private async findAllDirectoryByPath(relativePath: string) {
+  private async findAllDirectoryByPath(libraryId: number, relativePath: string) {
     if (relativePath === '/') {
       return await this.resourceModel
         .createQueryBuilder()
         .select('*')
-        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: '%/%', pathTwo: '%/%/%' })
+        .where('library_id = :id AND path LIKE :pathOne AND path NOT LIKE :pathTwo', { id: libraryId, pathOne: '%/%', pathTwo: '%/%/%' })
         .orderBy('path', 'DESC')
         .execute();
     } else {
       relativePath = relativePath.replace(/^\//, '');
       return await this.resourceModel.createQueryBuilder()
         .select('*')
-        .where('path LIKE :pathOne AND path NOT LIKE :pathTwo', { pathOne: `${relativePath}%/%`, pathTwo: `${relativePath}%/%/%` })
+        .where('library_id = :id AND path LIKE :pathOne AND path NOT LIKE :pathTwo', { id: libraryId, pathOne: `${relativePath}%/%`, pathTwo: `${relativePath}%/%/%` })
         .orderBy('path', 'DESC')
         .execute();
     }
@@ -137,8 +133,8 @@ export class ApiResourceController {
     directoryList.forEach(item => {
       const dirAllLayer = item.path.match(/.*?\//g);
       const dirName = dirAllLayer[dirAllLayer.length - 1].replace(/\/$/, '');
-      if (!tempMap[dirName]) tempMap[dirName] = [];
-      tempMap[dirName].push(item);
+      if (!tempMap[dirName]) tempMap[dirName] = { path: dirAllLayer.join(''), list: [] };
+      tempMap[dirName].list.push(item);
     });
 
     return Object.keys(tempMap).map(key => {
@@ -146,7 +142,8 @@ export class ApiResourceController {
       return {
         type: 'directory',
         dirName: key,
-        preview: currentDirResourceList.slice(0, 4).map(this.resourceService.formatResourceInfo),
+        path: currentDirResourceList.path,
+        preview: currentDirResourceList.list.slice(0, 4).map(this.resourceService.formatResourceInfo),
       };
     });
   }

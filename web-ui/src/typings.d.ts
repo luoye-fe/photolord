@@ -2,19 +2,33 @@ interface IPlainObject {
   [key: string]: any;
 }
 
-interface PhotoInfo {
+interface IResourceInfo {
   id: number;
   libraryId: number;
-  createDate: string;
-  modifyDate: string;
+  md5: string;
+  path: string;
+  name: string;
   format: string;
-  size: number;
   width: number;
   height: number;
-  name: string;
-  path: string;
-  md5: string;
+  size: number;
+  createDate: Date;
+  modifyDate: Date;
 }
+
+type TreeResourceItem = {
+  type: 'resource';
+  resourceInfo: IResourceInfo;
+};
+
+type TreeDirectoryItem = {
+  type: 'directory';
+  dirName: string;
+  path: string;
+  preview: IResourceInfo[];
+};
+
+type TreeItem = TreeResourceItem | TreeDirectoryItem;
 
 interface LibraryInfo {
   id: number;

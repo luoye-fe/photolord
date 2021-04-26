@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react';
+import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -21,7 +21,7 @@ interface PropsType {
 const TimelineTab = (props: PropsType) => {
   const size = 50;
   const [loading, setLoading] = useState(false);
-  const [photoListByDay, setPhotoListByDay] = useState<{ [key: string]: PhotoInfo[] }>({});
+  const [photoListByDay, setPhotoListByDay] = useState<{ [key: string]: IResourceInfo[] }>({});
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [hasLoadCount, setHasLoadCount] = useState(0);
@@ -33,7 +33,7 @@ const TimelineTab = (props: PropsType) => {
     dispatch,
   } = useContext(RootContext);
 
-  function fetchPhotoList() {
+  const fetchPhotoList = useCallback(() => {
     if (loading) return;
 
     setLoading(true);
@@ -55,7 +55,7 @@ const TimelineTab = (props: PropsType) => {
     })
       .then(res => {
         const { list = [], hasMore } = res.data;
-        list.forEach((photo: PhotoInfo) => {
+        list.forEach((photo: IResourceInfo) => {
           const day = dayjs(photo.createDate).format('YYYY-MM-DD');
           if (!photoListByDay[day]) photoListByDay[day] = [];
           photoListByDay[day].push(photo);
@@ -81,7 +81,7 @@ const TimelineTab = (props: PropsType) => {
           payload: false,
         });
       });
-  }
+  }, []);
 
   useEffect(() => {
     fetchPhotoList();

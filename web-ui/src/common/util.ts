@@ -6,10 +6,10 @@ export default null;
  */
 export function getItemSuitableHeight() {
   let itemHeight = 100;
-  const partCount = 7;
-  const minHeight = 80;
-  const maxHeight = 140;
-  const mainContainerEl = document.getElementById('main-container');
+  const partCount = 6;
+  const minHeight = 120;
+  const maxHeight = 180;
+  const mainContainerEl = document.querySelector('body');
 
   if (!mainContainerEl) return itemHeight;
 

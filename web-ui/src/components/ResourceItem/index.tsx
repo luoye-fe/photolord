@@ -8,16 +8,17 @@ import iconStyles from '@/common/iconfont.module.scss';
 const { baseURL } = config;
 
 interface PropsType {
-  photo: PhotoInfo;
+  photo: IResourceInfo;
   itemHeight?: number;
+  itemWidth?: number;
 }
 
 const ResourceItem = (props: PropsType) => {
-  const { photo, itemHeight = 100 } = props;
+  const { photo, itemHeight = 100, itemWidth } = props;
   const { width, height } = photo;
 
-  const imageWidth = width / height * itemHeight;
-  const imageResultUrl = `${baseURL}/transcode?md5=${photo.md5}&height=${itemHeight}`;
+  const imageWidth = itemWidth ? itemWidth : Math.floor(width / height * itemHeight);
+  const imageResultUrl = `${baseURL}/transcode?md5=${photo.md5}&width=${imageWidth}&height=${itemHeight}`;
 
   const [loading, setLoading] = useState(true);
   const [imageSrc, setImageSrc] = useState('');

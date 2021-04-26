@@ -10,7 +10,12 @@ import locale from '@/locales';
 
 import styles from './index.module.scss';
 
-const LibraryList = () => {
+interface PropsType {
+  onLibraryClick: (id: number) => void;
+}
+
+const LibraryList = (props: PropsType) => {
+  const { onLibraryClick } = props;
   const [libraryInfo, setLibraryInfo] = useState<LibraryInfo | undefined>(undefined);
   const [libraryList, setLibraryList] = useState<LibraryInfo[]>([]);
   const [mode, setMode] = useState('add');
@@ -134,7 +139,7 @@ const LibraryList = () => {
   }
 
   function handleEnterLibrary(libraryId: number) {
-    console.log(libraryId);
+    onLibraryClick(libraryId);
   }
 
   function handleDeleteLibrary(libraryId: number) {
