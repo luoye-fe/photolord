@@ -81,7 +81,7 @@ const DirItem = (props: PropsType) => {
         </div>
         <div className={styles['directory-action-container']} />
       </div>
-      <p className={styles['directory-name']} style={{ width: `${itemWidth}px` }}>{directory.dirName}</p>
+      <p className={styles['directory-name']} style={{ width: `${itemWidth}px` }} title={directory.dirName}>{directory.dirName}</p>
     </div>
   );
 };
