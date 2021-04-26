@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { getSearchParams } from 'ice';
 import { message, ConfigProvider } from 'antd';
 import zhCN from 'antd/lib/locale/zh_CN';
 import enUS from 'antd/lib/locale/en_US';
@@ -25,8 +26,9 @@ const localeMap = {
 };
 
 export default function Main() {
+  const { activeTabIndex: queryActiveTabIndex } = getSearchParams();
   const [showContent, setShowContent] = useState(false);
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [activeTabIndex, setActiveTabIndex] = useState(Number(queryActiveTabIndex) || 0);
   const [photoCount, setPhotoCount] = useState(0);
   const [breadcrumbConfig, setBreadcrumbConfig] = useState<BreadcrumbConfig[]>([]);
   const [tabList, setTabList] = useState(TAB_LIST);
@@ -87,9 +89,10 @@ export default function Main() {
         });
       });
   }, []);
+
   return (
     <Spin spinning={state.loading}>
-      {showContent ? (
+      {showContent && (
         <ConfigProvider locale={localeMap[state.setting.locale]}>
           <div className={styles.container}>
             <TitleBar
@@ -110,7 +113,7 @@ export default function Main() {
             </div>
           </div>
         </ConfigProvider>
-      ) : null}
+      )}
     </Spin>
   );
 }

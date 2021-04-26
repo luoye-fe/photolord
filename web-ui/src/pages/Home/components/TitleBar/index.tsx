@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { useHistory, getSearchParams } from 'ice';
 import classnames from 'classnames';
 
 import RootContext from '@/store/context';
@@ -19,12 +20,16 @@ const TitleBar = (props: PropsType) => {
     onActiveTabIndexChange,
   } = props;
 
+  const queryObj = getSearchParams();
+  const history = useHistory();
   const {
     state,
   } = useContext(RootContext);
 
   function handleActionItemClick(index: number) {
     if (state.loading) return;
+    queryObj.activeTabIndex = String(index);
+    history.push(`/home?${Object.keys(queryObj).map(key => `${key}=${queryObj[key]}`).join('&')}`);
     onActiveTabIndexChange(index);
   }
 

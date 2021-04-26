@@ -25,9 +25,9 @@ const TimelineTab = (props: PropsType) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [hasLoadCount, setHasLoadCount] = useState(0);
+  const [scrollableTarget, setScrollableTarget] = useState<HTMLElement | null>(null);
 
   const itemHeight = useMemo(() => getItemSuitableHeight(), []);
-  const scrollableTarget = useMemo(() => document.getElementById('main-container'), []);
 
   const {
     dispatch,
@@ -37,6 +37,8 @@ const TimelineTab = (props: PropsType) => {
     if (loading) return;
 
     setLoading(true);
+
+    // page loading
     if (page === 1) {
       dispatch({
         type: RootReducerActionType.SET_LOADING,
@@ -83,9 +85,10 @@ const TimelineTab = (props: PropsType) => {
 
   useEffect(() => {
     fetchPhotoList();
+    setScrollableTarget(document.getElementById('main-container'));
   }, []);
 
-  return (
+  return scrollableTarget && (
     <InfiniteScroll
       dataLength={hasLoadCount}
       next={fetchPhotoList}

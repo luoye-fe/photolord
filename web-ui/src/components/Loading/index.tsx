@@ -5,7 +5,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 interface PropsType extends SpinProps {
-  children?: React.ReactChild | null;
+  children?: React.ReactChild | null | false;
 }
 
 export default function Loading(props: PropsType) {
