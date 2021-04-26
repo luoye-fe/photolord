@@ -33,7 +33,7 @@ const TimelineTab = (props: PropsType) => {
     dispatch,
   } = useContext(RootContext);
 
-  const fetchPhotoList = useCallback(() => {
+  function fetchPhotoList() {
     if (loading) return;
 
     setLoading(true);
@@ -81,7 +81,7 @@ const TimelineTab = (props: PropsType) => {
           payload: false,
         });
       });
-  }, []);
+  }
 
   useEffect(() => {
     fetchPhotoList();
