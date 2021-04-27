@@ -143,10 +143,10 @@ export class ApiLibraryController {
       return;
     }
 
-    await this.libraryModel.update(id, {
-      analyse_ing: 1,
-    });
+    // remove all resource belong to this library
+    await this.resourceModel.delete({ library_id: id });
 
+    // publish library scan message
     await publishLibraryScanMessage(result);
 
     ctx.success({
