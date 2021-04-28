@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import { Modal, Form, Input, Switch } from 'antd';
 import locale from '@/locales';
 import RootContext from '@/store/context';
@@ -32,11 +32,11 @@ const LibrarySetting = (props: PropsType) => {
     onCancel();
   }
 
-  function getLocaleText(key: string) {
+  const getLocaleText = useCallback((key: string) => {
     const _locale = state.setting.locale;
     const options = { language: _locale };
     return locale(key, options);
-  }
+  }, [state.setting.locale]);
 
   useEffect(() => {
     if (show) {

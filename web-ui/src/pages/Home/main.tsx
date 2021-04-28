@@ -11,7 +11,6 @@ import Spin from '@/components/Loading';
 import locale from '@/locales';
 
 import TitleBar from './components/TitleBar';
-import ActionBar from './components/ActionBar';
 import LibraryTab from './components/LibraryTab';
 import TimelineTab from './components/TimelineTab';
 import SearchTab from './components/SearchTab';
@@ -29,8 +28,6 @@ export default function Main() {
   const { activeTabIndex: queryActiveTabIndex } = getSearchParams();
   const [showContent, setShowContent] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(Number(queryActiveTabIndex) || 0);
-  const [photoCount, setPhotoCount] = useState(0);
-  const [breadcrumbConfig, setBreadcrumbConfig] = useState<BreadcrumbConfig[]>([]);
   const [tabList, setTabList] = useState(TAB_LIST);
   const {
     state,
@@ -39,14 +36,6 @@ export default function Main() {
 
   function handleActiveTabIndexChange(index: number) {
     setActiveTabIndex(index);
-  }
-
-  function handlePhotoCountChange(count: number) {
-    setPhotoCount(count);
-  }
-
-  function handleBreadcrumbChange(breadcrumbConfig: BreadcrumbConfig[]) {
-    setBreadcrumbConfig(breadcrumbConfig);
   }
 
   useEffect(() => {
@@ -100,15 +89,9 @@ export default function Main() {
               activeTabIndex={activeTabIndex}
               onActiveTabIndexChange={handleActiveTabIndexChange}
             />
-            <ActionBar
-              photoCount={photoCount}
-              breadcrumb={breadcrumbConfig}
-            />
             <div className={styles.main} id="main-container">
               {activeTabIndex === 0 && <LibraryTab />}
-              {activeTabIndex === 1 && <TimelineTab
-                onBreadcrumbChange={handleBreadcrumbChange}
-                onPhotoCountChange={handlePhotoCountChange} />}
+              {activeTabIndex === 1 && <TimelineTab />}
               {activeTabIndex === 2 && <SearchTab />}
             </div>
           </div>

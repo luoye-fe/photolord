@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { message, Button } from 'antd';
 
 import LibraryItem from '@/components/LibraryItem';
@@ -11,7 +11,7 @@ import locale from '@/locales';
 import styles from './index.module.scss';
 
 interface PropsType {
-  onLibraryClick: (id: number) => void;
+  onLibraryClick: (libraryInfo: LibraryInfo) => void;
 }
 
 const LibraryList = (props: PropsType) => {
@@ -27,11 +27,11 @@ const LibraryList = (props: PropsType) => {
     dispatch,
   } = useContext(RootContext);
 
-  function getLocaleText(key: string) {
+  const getLocaleText = useCallback((key: string) => {
     const _locale = state.setting.locale;
     const options = { language: _locale };
     return locale(key, options);
-  }
+  }, [state.setting.locale]);
 
   async function getLibraryList(mute = false): Promise<LibraryInfo[]> {
     if (!mute) {
@@ -138,8 +138,8 @@ const LibraryList = (props: PropsType) => {
       });
   }
 
-  function handleEnterLibrary(libraryId: number) {
-    onLibraryClick(libraryId);
+  function handleEnterLibrary(libraryInfo: LibraryInfo) {
+    onLibraryClick(libraryInfo);
   }
 
   function handleDeleteLibrary(libraryId: number) {

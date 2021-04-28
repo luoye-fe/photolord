@@ -2,22 +2,35 @@ import React from 'react';
 import styles from './index.module.scss';
 
 interface PropsType {
-  photoCount?: number;
-  breadcrumb?: BreadcrumbConfig[];
+  children?: React.ReactNode;
 }
 
 const ActionBar = (props: PropsType) => {
-  // const { photoCount = 0, breadcrumb = [] } = props;
+  const { children } = props;
   return (
     <div className={styles.container}>
-      <div className={styles.breadcrumb}>
-
-      </div>
-      <div className={styles.filter}>
-
-      </div>
+      {children}
     </div>
   );
 };
 
+const ActionBarLeft = (props: PropsType) => {
+  const { children } = props;
+  return (
+    <div className={styles.left}>
+      {children}
+    </div>
+  );
+};
+
+const ActionBarRight = (props: PropsType) => {
+  const { children } = props;
+  return (
+    <div className={styles.right}>
+      {children}
+    </div>
+  );
+};
+
+export { ActionBarLeft, ActionBarRight };
 export default ActionBar;

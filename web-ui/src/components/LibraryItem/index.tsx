@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { FolderOpenOutlined, EllipsisOutlined, LoadingOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { Dropdown, Popconfirm } from 'antd';
@@ -9,7 +9,7 @@ import styles from './index.module.scss';
 
 interface PropsType {
   library: LibraryInfo;
-  onEnterLibrary: (id: number) => void;
+  onEnterLibrary: (libraryInfo: LibraryInfo) => void;
   onScanLibrary: (id: number) => void;
   onEditLibrary: (id: number) => void;
   onDeleteLibrary: (id: number) => void;
@@ -21,17 +21,17 @@ const LibraryItem = (props: PropsType) => {
     state,
   } = useContext(RootContext);
 
-  function getLocaleText(key: string) {
+  const getLocaleText = useCallback((key: string) => {
     const _locale = state.setting.locale;
     const options = { language: _locale };
     return locale(key, options);
-  }
+  }, [state.setting.locale]);
 
   return (
     <div className={styles['library-item-container']} title={library && library.path}>
       <FolderOpenOutlined className={styles['icon-folder']} />
       <div className={styles.info}>
-        <div><p onClick={() => onEnterLibrary(library.id)} className={classnames([styles.path, styles.text])} title={library.path}>{library.path}</p></div>
+        <div><p onClick={() => onEnterLibrary(library)} className={classnames([styles.path, styles.text])} title={library.path}>{library.path}</p></div>
         {styles.comment && <div><p className={classnames([styles.comment, styles.text])} title={library.comment}>{library.comment}</p></div>}
       </div>
       {library.analyseIng === 1 && <LoadingOutlined style={{ fontSize: 12, color: '#e9a049' }} spin />}

@@ -1,0 +1,20 @@
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll-view {
+  flex: 1;
+  overflow: scroll;
+  padding: 20px 60px;
+}
+
+.sticky-date {
+  color: #eee;
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0;
+  display: inline-block;
+  margin-right: 16px;
+}

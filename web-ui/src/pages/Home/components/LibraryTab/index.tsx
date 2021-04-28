@@ -1,20 +1,38 @@
-import React, { useMemo, useState, useCallback } from 'react';
-import { message } from 'antd';
+import React, { useMemo, useState, useCallback, useContext } from 'react';
+import { message, Breadcrumb, Menu } from 'antd';
 
 import LibraryList from '@/components/LibraryList';
 import ResourceItem from '@/components/ResourceItem';
 import DirItem from '@/components/DirItem';
 import fetch from '@/common/fetch';
 import { getItemSuitableHeight } from '@/common/util';
+import RootContext from '@/store/context';
+import locale from '@/locales';
+
 import styles from './index.module.scss';
+import ActionBar, { ActionBarLeft } from '../ActionBar';
+import Badge from '../Badge';
+
+type DirTree = {
+  dirName: string;
+  path: string;
+  active: boolean;
+}[];
 
 const LibraryTab = () => {
-  const [tree, setTree] = useState<string[][]>([]);
+  const [tree, setTree] = useState<DirTree[]>([]);
   const [showLibraryList, setShowLibraryList] = useState(true);
   const [currentLayerList, setCurrentLayerList] = useState<TreeItem[]>([]);
   const [activeLibraryId, setActiveLibraryId] = useState<number | null>(null);
 
   const itemHeight = useMemo(() => getItemSuitableHeight(), []);
+  const { state } = useContext(RootContext);
+
+  const getLocaleText = useCallback((key: string) => {
+    const _locale = state.setting.locale;
+    const options = { language: _locale };
+    return locale(key, options);
+  }, [state.setting.locale]);
 
   const fetchData = useCallback((id: number, relativePath: string) => {
     return fetch({
@@ -26,21 +44,88 @@ const LibraryTab = () => {
     });
   }, []);
 
-  async function handleDirClick(path: string) {
+  const generateTreeResult = useCallback((targetPath: string, prevTree: DirTree[], nextDir: DirTree) => {
+    const treeResult: DirTree[] = [];
+    const copiedPrevTree: DirTree[] = JSON.parse(JSON.stringify(prevTree));
+
+    let hasMatchedTreeItem = false;
+
+    for (let i = 0; i < copiedPrevTree.length; i += 1) {
+      const item = copiedPrevTree[i];
+      if (i === 0) {
+        treeResult[0] = item;
+      } else {
+        treeResult[i] = item.map(j => {
+          if (j.path === targetPath) {
+            j.active = true;
+            hasMatchedTreeItem = true;
+          } else if (new RegExp(j.path).test(targetPath)) {
+            j.active = true;
+          } else {
+            j.active = false;
+          }
+          return j;
+        });
+
+        if (hasMatchedTreeItem) {
+          treeResult[i + 1] = nextDir;
+          break;
+        }
+      }
+    }
+
+    return treeResult;
+  }, []);
+
+  function handleBreadcrumbClick(path: string) {
+    handleDirClick(path, true);
+  }
+
+  async function handleDirClick(path: string, fromBreadcrumb?: boolean) {
     if (!activeLibraryId) return;
     try {
-      const { data } = await fetchData(activeLibraryId, `/${path}`);
-      setCurrentLayerList(data.list);
+      const requestPath = `/${path}`;
+      const { data } = await fetchData(activeLibraryId, requestPath);
+      const itemList: TreeItem[] = data.list || [];
+
+      const dirList = (itemList.filter(item => item.type === 'directory') as TreeDirectoryItem[]).map(item => ({
+        dirName: item.dirName,
+        path: item.path,
+        active: false,
+      }));
+
+      if (fromBreadcrumb) {
+        const treeResult = generateTreeResult(path, tree, dirList);
+        setTree(treeResult);
+      } else {
+        const treeResult = [...tree, dirList].map(i => i.map(j => {
+          if (j.path === path) j.active = true;
+          return j;
+        }));
+        setTree(treeResult);
+      }
+
+      setCurrentLayerList(itemList);
     } catch (e) {
       message.error(e.message);
     }
   }
 
-  async function handleLibraryClick(id: number) {
+  async function handleLibraryClick(libraryInfo: LibraryInfo) {
+    const { id, path: libraryPath } = libraryInfo;
     setActiveLibraryId(id);
 
     try {
       const { data } = await fetchData(id, '/');
+      const itemList: TreeItem[] = data.list || [];
+
+      const dirList = (itemList.filter(item => item.type === 'directory') as TreeDirectoryItem[]).map(item => ({
+        dirName: item.dirName,
+        path: item.path,
+        active: false,
+      }));
+      setTree([[{ dirName: libraryPath, path: '', active: true }], dirList]);
+
       setShowLibraryList(false);
       setCurrentLayerList(data.list);
     } catch (e) {
@@ -50,12 +135,43 @@ const LibraryTab = () => {
 
   return (
     <>
+      {!showLibraryList && (
+        <ActionBar>
+          <ActionBarLeft>
+            <Breadcrumb className={styles.breadcrumb} separator={<span className={styles['breadcrumb-item']}>/</span>}>
+              <Breadcrumb.Item className={styles['breadcrumb-item']} onClick={() => setShowLibraryList(true)}>{getLocaleText('common.library')}</Breadcrumb.Item>
+              {tree.slice(0, tree.length - 1).map((item, index) => {
+                return (
+                  <Breadcrumb.Item
+                    key={index}
+                    className={styles['breadcrumb-item']}
+                    onClick={() => handleBreadcrumbClick(item[0].path)}
+                    overlay={item.length <= 1 ? undefined : (
+                      <Menu selectedKeys={item.filter(i => i.active).map(i => i.path)}>
+                        {item.map(j => {
+                          return <Menu.Item key={j.path} onClick={() => handleBreadcrumbClick(j.path)}>{j.dirName}</Menu.Item>;
+                        })}
+                      </Menu>
+                    )}>
+                    {item.filter(i => i.active)[0]?.dirName}
+                  </Breadcrumb.Item>
+                );
+              })}
+            </Breadcrumb>
+            <Badge text={currentLayerList.length} />
+          </ActionBarLeft>
+        </ActionBar>
+      )}
       {showLibraryList && <LibraryList onLibraryClick={handleLibraryClick} />}
-      {!showLibraryList && currentLayerList.map(item => {
-        if (item.type === 'directory') return <div key={item.dirName} className={styles['item-wrap']}><DirItem onDirClick={handleDirClick} itemHeight={itemHeight} directory={item} /></div>;
-        if (item.type === 'resource') return <div key={item.resourceInfo.path} className={styles['item-wrap']}><ResourceItem itemWidth={itemHeight} itemHeight={itemHeight} photo={item.resourceInfo} /></div>;
-        return null;
-      })}
+      {!showLibraryList && (
+        <div className={styles.container}>
+          {currentLayerList.map(item => {
+            if (item.type === 'directory') return <div key={item.dirName} className={styles['item-wrap']}><DirItem onDirClick={handleDirClick} itemHeight={itemHeight} directory={item} /></div>;
+            if (item.type === 'resource') return <div key={item.resourceInfo.path} className={styles['item-wrap']}><ResourceItem itemWidth={itemHeight} itemHeight={itemHeight} photo={item.resourceInfo} /></div>;
+            return null;
+          })}
+        </div>
+      )}
     </>
   );
 };

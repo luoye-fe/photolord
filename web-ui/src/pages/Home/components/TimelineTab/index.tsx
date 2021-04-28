@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -12,17 +12,17 @@ import RootContext from '@/store/context';
 import { RootReducerActionType } from '@/store/type';
 
 import LoadingMore from '../LoadingMore';
+import ActionBar, { ActionBarLeft } from '../ActionBar';
+import Badge from '../Badge';
 
-interface PropsType {
-  onBreadcrumbChange?: (breadcrumbConfig: BreadcrumbConfig[]) => void;
-  onPhotoCountChange?: (count: number) => void;
-}
+import styles from './index.module.scss';
 
-const TimelineTab = (props: PropsType) => {
+const TimelineTab = () => {
   const size = 50;
   const [loading, setLoading] = useState(false);
   const [photoListByDay, setPhotoListByDay] = useState<{ [key: string]: IResourceInfo[] }>({});
   const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [hasLoadCount, setHasLoadCount] = useState(0);
   const [scrollableTarget, setScrollableTarget] = useState<HTMLElement | null>(null);
@@ -54,7 +54,7 @@ const TimelineTab = (props: PropsType) => {
       },
     })
       .then(res => {
-        const { list = [], hasMore } = res.data;
+        const { list = [], hasMore, count = 0 } = res.data;
         list.forEach((photo: IResourceInfo) => {
           const day = dayjs(photo.createDate).format('YYYY-MM-DD');
           if (!photoListByDay[day]) photoListByDay[day] = [];
@@ -66,6 +66,7 @@ const TimelineTab = (props: PropsType) => {
         setHasMore(hasMore);
         setPhotoListByDay(photoListByDay);
         setLoading(false);
+        setCount(count);
 
         dispatch({
           type: RootReducerActionType.SET_LOADING,
@@ -85,23 +86,34 @@ const TimelineTab = (props: PropsType) => {
 
   useEffect(() => {
     fetchPhotoList();
-    setScrollableTarget(document.getElementById('main-container'));
+    setScrollableTarget(document.getElementById('timeline-scroll-view'));
   }, []);
 
-  return scrollableTarget && (
-    <InfiniteScroll
-      dataLength={hasLoadCount}
-      next={fetchPhotoList}
-      hasMore={hasMore}
-      loader={<LoadingMore />}
-      scrollableTarget={scrollableTarget}>
-      {Object.keys(photoListByDay).map(day => (
-        <div key={day}>
-          <ListTitle text={day} />
-          {photoListByDay[day].map(item => <ResourceItem key={item.id} photo={item} itemHeight={itemHeight} />)}
-        </div>
-      ))}
-    </InfiniteScroll>
+  return (
+    <div className={styles.container}>
+      <ActionBar>
+        <ActionBarLeft>
+          <Badge text={count} />
+        </ActionBarLeft>
+      </ActionBar>
+      <div className={styles['scroll-view']} id="timeline-scroll-view">
+        {scrollableTarget && (
+          <InfiniteScroll
+            dataLength={hasLoadCount}
+            next={fetchPhotoList}
+            hasMore={hasMore}
+            loader={<LoadingMore />}
+            scrollableTarget={scrollableTarget}>
+            {Object.keys(photoListByDay).map(day => (
+              <div key={day}>
+                <ListTitle text={day} />
+                {photoListByDay[day].map(item => <ResourceItem key={item.id} photo={item} itemHeight={itemHeight} />)}
+              </div>
+            ))}
+          </InfiniteScroll>
+        )}
+      </div>
+    </div>
   );
 };
 

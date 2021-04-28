@@ -1,5 +1,24 @@
+.container {
+  padding: 20px 60px;
+}
+
 .item-wrap {
   display: inline-block;
   vertical-align: top;
   padding: 8px;
+}
+
+.breadcrumb {
+  display: inline-block;
+  margin-right: 16px;
+  color: hsla(0, 0%, 100%, 0.75);
+}
+
+.breadcrumb-item {
+  color: hsla(0, 0%, 100%, 0.75);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: bold;
+  margin: 0;
+  cursor: pointer;
 }
