@@ -22,3 +22,9 @@
   margin: 0;
   cursor: pointer;
 }
+
+:global {
+  .ant-breadcrumb > span:last-child {
+    color: hsla(0, 0%, 100%, 0.75);
+  }
+}
