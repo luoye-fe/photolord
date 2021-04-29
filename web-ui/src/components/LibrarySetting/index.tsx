@@ -1,7 +1,6 @@
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Form, Input, Switch } from 'antd';
-import locale from '@/locales';
-import RootContext from '@/store/context';
+import useLocale from '@/hooks/locale';
 
 import styles from './index.module.scss';
 
@@ -16,9 +15,7 @@ interface PropsType {
 const LibrarySetting = (props: PropsType) => {
   const { mode = 'add', show, onConfirm, onCancel, libraryInfo } = props;
   const [formInstance] = Form.useForm();
-  const {
-    state,
-  } = useContext(RootContext);
+  const [getLocaleText] = useLocale();
 
   function handleOk() {
     formInstance
@@ -31,12 +28,6 @@ const LibrarySetting = (props: PropsType) => {
   function handleCancel() {
     onCancel();
   }
-
-  const getLocaleText = useCallback((key: string) => {
-    const _locale = state.setting.locale;
-    const options = { language: _locale };
-    return locale(key, options);
-  }, [state.setting.locale]);
 
   useEffect(() => {
     if (show) {

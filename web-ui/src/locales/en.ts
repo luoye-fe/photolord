@@ -16,6 +16,7 @@ export const common = {
   library_path: 'Library Path',
   library_path_input: 'Please Input Library Absolute Path',
   auto_analyse: 'Auto start analysis after adding/update',
+  detail: 'Detail',
 };
 
 export const exifInfo = {

@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { EllipsisOutlined } from '@ant-design/icons';
+import { Dropdown } from 'antd';
 import { config } from 'ice';
 import classnames from 'classnames';
 
+import useLocale from '@/hooks/locale';
+
 import styles from './index.module.scss';
-import iconStyles from '@/common/iconfont.module.scss';
 
 const { baseURL } = config;
 
@@ -25,6 +28,8 @@ const ResourceItem = (props: PropsType) => {
   const containerElement = useRef<HTMLDivElement>(null);
   const imageElement = useRef<HTMLImageElement>(null);
 
+  const [getLocaleText] = useLocale();
+
   let observer: IntersectionObserver;
 
   function handleIntersect(changes) {
@@ -45,6 +50,10 @@ const ResourceItem = (props: PropsType) => {
     }
   }
 
+  function handleShowResourceDetail() {
+    console.log(111);
+  }
+
   useEffect(() => {
     observer = new IntersectionObserver(handleIntersect, {
       root: null,
@@ -60,7 +69,13 @@ const ResourceItem = (props: PropsType) => {
         {imageSrc && <img ref={imageElement} className={classnames(styles['resource-image'], !loading && styles['resource-image-show'])} src={imageSrc} />}
         <div className={styles['resource-action-container']}>
           <div className={styles['resource-action-icons']}>
-            <i className={classnames([styles['icon-point'], iconStyles['iconfont'], iconStyles['icon-point']])} />
+            <Dropdown overlay={(
+              <ul className={styles['library-action-menu']}>
+                <li className={styles['library-action-menu-item']} onClick={() => handleShowResourceDetail()}>{getLocaleText('common.detail')}</li>
+              </ul>
+            )}>
+              <EllipsisOutlined className={styles['icon-setting']} />
+            </Dropdown>
           </div>
         </div>
       </div>

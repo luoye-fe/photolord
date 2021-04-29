@@ -1,9 +1,9 @@
-import React, { useCallback, useContext } from 'react';
+import React from 'react';
 import { FolderOpenOutlined, EllipsisOutlined, LoadingOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { Dropdown, Popconfirm } from 'antd';
-import locale from '@/locales';
-import RootContext from '@/store/context';
+
+import useLocale from '@/hooks/locale';
 
 import styles from './index.module.scss';
 
@@ -17,15 +17,8 @@ interface PropsType {
 
 const LibraryItem = (props: PropsType) => {
   const { library, onEnterLibrary, onScanLibrary, onEditLibrary, onDeleteLibrary } = props;
-  const {
-    state,
-  } = useContext(RootContext);
 
-  const getLocaleText = useCallback((key: string) => {
-    const _locale = state.setting.locale;
-    const options = { language: _locale };
-    return locale(key, options);
-  }, [state.setting.locale]);
+  const [getLocaleText] = useLocale();
 
   return (
     <div className={styles['library-item-container']} title={library && library.path}>

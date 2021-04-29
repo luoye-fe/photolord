@@ -18,6 +18,7 @@ export const common = {
   library_comment: '资源库备注',
   library_comment_input: '请输入资源库备注',
   auto_analyse: '添加/更新后自动开始分析',
+  detail: '详情',
 };
 
 export const exifInfo = {

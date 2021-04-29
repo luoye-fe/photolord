@@ -6,7 +6,7 @@ import LibrarySetting from '@/components/LibrarySetting';
 import fetch from '@/common/fetch';
 import RootContext from '@/store/context';
 import { RootReducerActionType } from '@/store/type';
-import locale from '@/locales';
+import useLocale from '@/hooks/locale';
 
 import styles from './index.module.scss';
 
@@ -23,15 +23,10 @@ const LibraryList = (props: PropsType) => {
   const [autoUpdateList, setAutoUpdateList] = useState(false);
 
   const {
-    state,
     dispatch,
   } = useContext(RootContext);
 
-  const getLocaleText = useCallback((key: string) => {
-    const _locale = state.setting.locale;
-    const options = { language: _locale };
-    return locale(key, options);
-  }, [state.setting.locale]);
+  const [getLocaleText] = useLocale();
 
   async function getLibraryList(mute = false): Promise<LibraryInfo[]> {
     if (!mute) {

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useContext } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { message, Breadcrumb, Menu } from 'antd';
 
 import LibraryList from '@/components/LibraryList';
@@ -6,8 +6,7 @@ import ResourceItem from '@/components/ResourceItem';
 import DirItem from '@/components/DirItem';
 import fetch from '@/common/fetch';
 import { getItemSuitableHeight } from '@/common/util';
-import RootContext from '@/store/context';
-import locale from '@/locales';
+import useLocale from '@/hooks/locale';
 
 import styles from './index.module.scss';
 import ActionBar, { ActionBarLeft } from '../ActionBar';
@@ -26,13 +25,8 @@ const LibraryTab = () => {
   const [activeLibraryId, setActiveLibraryId] = useState<number | null>(null);
 
   const itemHeight = useMemo(() => getItemSuitableHeight(), []);
-  const { state } = useContext(RootContext);
 
-  const getLocaleText = useCallback((key: string) => {
-    const _locale = state.setting.locale;
-    const options = { language: _locale };
-    return locale(key, options);
-  }, [state.setting.locale]);
+  const [getLocaleText] = useLocale();
 
   const fetchData = useCallback((id: number, relativePath: string) => {
     return fetch({

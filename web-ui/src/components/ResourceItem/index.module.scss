@@ -43,10 +43,13 @@
 
 .resource-action-icons {
   display: flex;
+  justify-content: flex-end;
 }
 
-.icon-point {
+.icon-setting {
+  font-size: 22px;
   color: hsla(0, 0%, 100%, 0.75);
+  cursor: pointer;
 }
 
 .resource-image {
