@@ -1,0 +1,34 @@
+.menu {
+  background-color: #191a1c;
+  width: 180px;
+  box-sizing: border-box;
+  padding: 8px 0;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 35%);
+}
+
+.menu-item {
+  background-color: #191a1c;
+  color: hsla(0, 0%, 100%, 0.7);
+  font-size: 14px;
+  line-height: 30px;
+  cursor: pointer;
+  list-style: none;
+  display: block;
+  padding: 0 20px;
+  transition: all ease 0.3s;
+}
+
+.menu-item-disable {
+  color: hsla(0, 0%, 100%, 0.3);
+}
+
+.menu-item:hover {
+  background-color: hsla(0, 0%, 100%, 0.08);
+  color: #fff;
+}
+
+.menu-item-disable:hover {
+  background-color: #191a1c;
+  color: hsla(0, 0%, 100%, 0.3);
+}

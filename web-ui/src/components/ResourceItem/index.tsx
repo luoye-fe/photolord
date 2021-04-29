@@ -4,6 +4,7 @@ import { Dropdown } from 'antd';
 import { config } from 'ice';
 import classnames from 'classnames';
 
+import CustomMenu, { CustomMenuItem } from '@/components/CustomMenu';
 import useLocale from '@/hooks/locale';
 
 import styles from './index.module.scss';
@@ -70,9 +71,9 @@ const ResourceItem = (props: PropsType) => {
         <div className={styles['resource-action-container']}>
           <div className={styles['resource-action-icons']}>
             <Dropdown overlay={(
-              <ul className={styles['library-action-menu']}>
-                <li className={styles['library-action-menu-item']} onClick={() => handleShowResourceDetail()}>{getLocaleText('common.detail')}</li>
-              </ul>
+              <CustomMenu>
+                <CustomMenuItem onClick={handleShowResourceDetail}>{getLocaleText('common.detail')}</CustomMenuItem>
+              </CustomMenu>
             )}>
               <EllipsisOutlined className={styles['icon-setting']} />
             </Dropdown>
