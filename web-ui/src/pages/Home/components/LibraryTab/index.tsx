@@ -112,7 +112,7 @@ const LibraryTab = () => {
   }
 
   async function handleLibraryClick(libraryInfo: LibraryInfo) {
-    const { id, path: libraryPath } = libraryInfo;
+    const { id } = libraryInfo;
     setActiveLibraryId(id);
 
     try {
@@ -124,7 +124,7 @@ const LibraryTab = () => {
         path: item.path,
         active: false,
       }));
-      setTree([[{ dirName: libraryPath, path: '', active: true }], dirList]);
+      setTree([[{ dirName: 'root', path: '', active: true }], dirList]);
 
       setShowLibraryList(false);
       setCurrentLayerList(data.list);
