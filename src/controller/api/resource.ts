@@ -7,6 +7,7 @@ import { ResourceModel } from '@/entity/resource';
 import ResourceService from '@/service/api/resource';
 import { Context } from 'node:vm';
 import { IResourceAnalyseResult, IResourceInfo } from '@/typings';
+import { ResourceExifModel } from '@/entity/resource_exif';
 
 type TreeResourceItem = {
   type: 'resource';
@@ -34,6 +35,9 @@ export class ApiResourceController {
 
   @InjectEntityModel(ResourceModel)
   resourceModel: Repository<ResourceModel>;
+
+  @InjectEntityModel(ResourceExifModel)
+  resourceExifModel: Repository<ResourceExifModel>;
 
   @Inject()
   resourceService: ResourceService;
@@ -76,6 +80,23 @@ export class ApiResourceController {
       count,
       hasMore: count > page * size,
       list: result.map(this.resourceService.formatResourceInfo),
+    });
+  }
+
+  @Get('/detail')
+  async detail(ctx: Context) {
+    const { md5 } = ctx.query;
+    if (!md5) return ctx.fail(400, ctx.errorCode.Params_Error);
+
+    const baseDetail = await this.resourceModel.findOne({ md5 });
+    const exifDetail = await this.resourceExifModel.find({ md5 });
+
+    ctx.success({
+      baseDetail,
+      exifDetail: exifDetail.reduce((s, i) => {
+        s[i.key] = i.value;
+        return s;
+      }, {}),
     });
   }
 
