@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { message, Button } from 'antd';
 
 import LibraryItem from '@/components/LibraryItem';
 import LibrarySetting from '@/components/LibrarySetting';
 import fetch from '@/common/fetch';
-import RootContext from '@/store/context';
-import { RootReducerActionType } from '@/store/type';
 import useLocale from '@/hooks/locale';
+import useLoading from '@/hooks/loading';
 
 import styles from './index.module.scss';
 
@@ -21,20 +20,11 @@ const LibraryList = (props: PropsType) => {
   const [mode, setMode] = useState('add');
   const [showLibrarySettingModal, setShowLibrarySettingModal] = useState(false);
   const [autoUpdateList, setAutoUpdateList] = useState(false);
-
-  const {
-    dispatch,
-  } = useContext(RootContext);
-
+  const [setStoreLoading] = useLoading();
   const [getLocaleText] = useLocale();
 
   async function getLibraryList(mute = false): Promise<LibraryInfo[]> {
-    if (!mute) {
-      dispatch({
-        type: RootReducerActionType.SET_LOADING,
-        payload: true,
-      });
-    }
+    if (!mute) setStoreLoading(true);
 
     try {
       const res = await fetch({
@@ -43,19 +33,13 @@ const LibraryList = (props: PropsType) => {
       const { list = [] } = res.data;
       if (!mute) {
         setLibraryList(list);
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
       }
       return list as LibraryInfo[];
     } catch (e) {
       if (!mute) {
         message.error(e.message);
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
       }
     }
 
@@ -102,10 +86,7 @@ const LibraryList = (props: PropsType) => {
   }
 
   function handleLibrarySettingConfirm(res: LibraryInfo) {
-    dispatch({
-      type: RootReducerActionType.SET_LOADING,
-      payload: true,
-    });
+    setStoreLoading(true);
 
     fetch({
       url: mode === 'add' ? '/library/create' : '/library/update',
@@ -126,10 +107,7 @@ const LibraryList = (props: PropsType) => {
       })
       .catch(e => {
         message.error(e.message);
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
       });
   }
 
@@ -138,10 +116,7 @@ const LibraryList = (props: PropsType) => {
   }
 
   function handleDeleteLibrary(libraryId: number) {
-    dispatch({
-      type: RootReducerActionType.SET_LOADING,
-      payload: true,
-    });
+    setStoreLoading(true);
     fetch({
       url: '/library/delete',
       method: 'POST',
@@ -155,18 +130,12 @@ const LibraryList = (props: PropsType) => {
       })
       .catch(e => {
         message.error(e.message);
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
       });
   }
 
   function handleScanLibrary(libraryId: number) {
-    dispatch({
-      type: RootReducerActionType.SET_LOADING,
-      payload: true,
-    });
+    setStoreLoading(true);
 
     fetch({
       url: '/library/scan',
@@ -178,18 +147,12 @@ const LibraryList = (props: PropsType) => {
       .then(() => {
         message.success(getLocaleText('common.scan_library_begin_message'));
 
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
         setAutoUpdateList(true);
       })
       .catch(e => {
         message.error(e.message);
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
       });
   }
 

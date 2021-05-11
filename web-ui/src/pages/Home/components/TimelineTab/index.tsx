@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react';
+import React, {useEffect, useState, useMemo } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -7,9 +7,7 @@ import ResourceItem from '@/components/ResourceItem';
 import ListTitle from '@/components/ListTitle';
 import fetch from '@/common/fetch';
 import { getItemSuitableHeight } from '@/common/util';
-
-import RootContext from '@/store/context';
-import { RootReducerActionType } from '@/store/type';
+import useLoading from '@/hooks/loading';
 
 import LoadingMore from '../LoadingMore';
 import ActionBar, { ActionBarLeft } from '../ActionBar';
@@ -26,12 +24,9 @@ const TimelineTab = () => {
   const [hasMore, setHasMore] = useState(false);
   const [hasLoadCount, setHasLoadCount] = useState(0);
   const [scrollableTarget, setScrollableTarget] = useState<HTMLElement | null>(null);
+  const [setStoreLoading] = useLoading();
 
   const itemHeight = useMemo(() => getItemSuitableHeight(), []);
-
-  const {
-    dispatch,
-  } = useContext(RootContext);
 
   function fetchPhotoList() {
     if (loading) return;
@@ -40,10 +35,7 @@ const TimelineTab = () => {
 
     // page loading
     if (page === 1) {
-      dispatch({
-        type: RootReducerActionType.SET_LOADING,
-        payload: true,
-      });
+      setStoreLoading(true);
     }
 
     fetch({
@@ -68,19 +60,13 @@ const TimelineTab = () => {
         setLoading(false);
         setCount(count);
 
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
       })
       .catch(e => {
         message.error(e.message);
         setLoading(false);
 
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
       });
   }
 

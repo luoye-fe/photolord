@@ -9,6 +9,7 @@ import { RootReducerActionType } from '@/store/type';
 import fetch from '@/common/fetch';
 import Spin from '@/components/Loading';
 import locale from '@/locales';
+import useLoading from '@/hooks/loading';
 
 import TitleBar from './components/TitleBar';
 import LibraryTab from './components/LibraryTab';
@@ -29,6 +30,8 @@ export default function Main() {
   const [showContent, setShowContent] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(Number(queryActiveTabIndex) || 0);
   const [tabList, setTabList] = useState(TAB_LIST);
+  const [setStoreLoading] = useLoading();
+
   const {
     state,
     dispatch,
@@ -46,20 +49,12 @@ export default function Main() {
   }, [state.setting.locale]);
 
   useEffect(() => {
-    dispatch({
-      type: RootReducerActionType.SET_LOADING,
-      payload: true,
-    });
+    setStoreLoading(true);
     fetch({
       url: '/setting/info',
     })
       .then(res => {
         const { locale = 'en' } = res.data;
-
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
 
         dispatch({
           type: RootReducerActionType.SET_SETTING,
@@ -69,13 +64,11 @@ export default function Main() {
         });
 
         setShowContent(true);
+        setStoreLoading(false);
       })
       .catch(e => {
         message.error(e.message);
-        dispatch({
-          type: RootReducerActionType.SET_LOADING,
-          payload: false,
-        });
+        setStoreLoading(false);
       });
   }, []);
 
