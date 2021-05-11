@@ -8,9 +8,10 @@ export default function useLocale() {
     state,
   } = useContext(RootContext);
 
-  const getLocaleText = useCallback((key: string) => {
+  const getLocaleText = useCallback((key: string, uppercase?: boolean) => {
     const _locale = state.setting.locale;
     const options = { language: _locale };
+    if (uppercase) return locale(key, options).toLocaleLowerCase();
     return locale(key, options);
   }, [state.setting.locale]);
 
