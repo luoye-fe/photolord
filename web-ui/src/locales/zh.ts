@@ -1,6 +1,8 @@
 export const common = {
   library: '资源库',
   libraries: '资源库',
+  resource: '资源',
+  resources: '资源',
   timeline: '时间线',
   search: '搜索',
   scan_library: '扫描资源库',
@@ -19,6 +21,7 @@ export const common = {
   library_comment_input: '请输入资源库备注',
   auto_analyse: '添加/更新后自动开始分析',
   detail: '详情',
+  confirm: '确认',
 };
 
 export const exifInfo = {

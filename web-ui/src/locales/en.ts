@@ -1,6 +1,8 @@
 export const common = {
   library: 'library',
   libraries: 'libraries',
+  resource: 'resource',
+  resources: 'resources',
   timeline: 'timeline',
   search: 'search',
   scan_library: 'Scan Library',
@@ -17,6 +19,7 @@ export const common = {
   library_path_input: 'Please Input Library Absolute Path',
   auto_analyse: 'Auto start analysis after adding/update',
   detail: 'Detail',
+  confirm: 'Confirm',
 };
 
 export const exifInfo = {
