@@ -92,8 +92,8 @@ export class ApiResourceController {
     const exifDetail = await this.resourceExifModel.find({ md5 });
 
     ctx.success({
-      baseDetail,
-      exifDetail: exifDetail.reduce((s, i) => {
+      ...this.resourceService.formatResourceInfo(baseDetail),
+      exif: exifDetail.reduce((s, i) => {
         s[i.key] = i.value;
         return s;
       }, {}),
