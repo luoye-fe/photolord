@@ -5,6 +5,11 @@ interface IPlainObject {
   [key: string]: any;
 }
 
+interface IObjectDetectResult {
+  label: string;
+  precision: number;
+}
+
 interface IResponse {
   code: StatusCodes;
   message: string;
@@ -22,6 +27,7 @@ interface IResourceAnalyseResult {
   createDate: Date;
   modifyDate: Date;
   exif: IPlainObject;
+  objectDetectResult: IObjectDetectResult[]
 }
 
 interface IResourceInfo {

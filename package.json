@@ -19,6 +19,8 @@
     "@midwayjs/logger": "^2.8.13",
     "@midwayjs/orm": "^1.3.1",
     "@midwayjs/web": "^2.9.1",
+    "@tensorflow/tfjs-core": "^3.6.0",
+    "@tensorflow/tfjs-node-gpu": "^3.6.1",
     "@types/react": "^16.9.20",
     "@types/react-dom": "^16.9.5",
     "antd": "^4.15.1",

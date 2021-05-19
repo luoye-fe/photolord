@@ -5,9 +5,10 @@ import sharp from 'sharp';
 import exifr from 'exifr';
 
 import { md5Buffer } from '@/utils/index';
+import DetectObject from '@/detect/object/index';
 
 import { IMAGE_EXTENSIONS } from '@/const/token/image';
-import { IPlainObject, IResourceAnalyseResult } from '@/typings';
+import { IObjectDetectResult, IPlainObject, IResourceAnalyseResult } from '@/typings';
 
 function formatExif(exif: IPlainObject) {
   const result = {};
@@ -49,22 +50,39 @@ export async function analyseResource(resourcePath: string): Promise<IResourceAn
   if (!resourceIsExists) throw new Error('Resource is not exists');
   if (!isImage(resourcePath)) throw new Error('Resource is not image');
 
+  // get meta data
   let metaData = null;
   try {
     metaData = await sharp(resourcePath).metadata();
   } catch (e) {
     global.agent.logger.info(`Sharp resource metadata error, does not affect the main process, ${resourcePath}`);
+    global.agent.logger.error(e);
   }
 
   if (!metaData) return null;
 
-  let exifInfo = null;
   const resourceBufferData = fse.readFileSync(resourcePath);
+
+  // get exif data
+  let exifInfo = null;
   try {
     exifInfo = await exifr.parse(resourceBufferData);
   } catch (e) {
     global.agent.logger.info(`Get resource exif error, does not affect the main process, ${resourcePath}`);
+    global.agent.logger.error(e);
   }
+
+  // get object detect data
+  let objectDetectResult: IObjectDetectResult[] = [];
+  try {
+    const objectDetectInstance = DetectObject.getInstance();
+    objectDetectResult = await objectDetectInstance.detect(resourcePath);
+  } catch (e) {
+    global.agent.logger.info(`Get resource object detect result error, does not affect the main process, ${resourcePath}`);
+    global.agent.logger.error(e);
+  }
+
+  // get face detect data
 
   const md5 = md5Buffer(resourceBufferData);
   const stat = fse.statSync(resourcePath);
@@ -80,5 +98,6 @@ export async function analyseResource(resourcePath: string): Promise<IResourceAn
     createDate: stat.birthtime,
     modifyDate: stat.mtime,
     exif: formatExif(exifInfo),
+    objectDetectResult,
   };
 }

@@ -8,7 +8,8 @@ import { analyseResource } from '@/utils/resource';
 import { LibraryModel } from '@/entity/library';
 import { ResourceModel } from '@/entity/resource';
 import { ResourceExifModel } from '@/entity/resource_exif';
-import { IPlainObject, IResourceActionResult, IResourceInfo } from '@/typings';
+import { ResourceObjectModel } from '@/entity/resource_object';
+import { IObjectDetectResult, IPlainObject, IResourceActionResult, IResourceInfo } from '@/typings';
 
 @Provide()
 export default class ApiResourceService {
@@ -20,6 +21,9 @@ export default class ApiResourceService {
 
   @InjectEntityModel(ResourceExifModel)
   private resourceExifModel: Repository<ResourceExifModel>;
+
+  @InjectEntityModel(ResourceObjectModel)
+  private resourceObjectModel: Repository<ResourceObjectModel>;
 
   private queueInstance = new ResourceQueue();
 
@@ -48,9 +52,9 @@ export default class ApiResourceService {
       const resourceInfo = await analyseResource(resourcePath);
       if (!resourceInfo) return;
 
-      // update or save
+      // save meta data
       try {
-        await this.resourceExifModel
+        await this.resourceModel
           .createQueryBuilder()
           .insert()
           .into(ResourceModel)
@@ -71,8 +75,11 @@ export default class ApiResourceService {
           .execute();
       } catch (e) { } // eat all conflict error
 
-      // insert image exif
+      // save image exif
       await this.insertResourceExif(resourceInfo.md5, resourceInfo.exif);
+
+      // save object detect result
+      await this.insertResourceObjectDetectResult(resourceInfo.md5, resourceInfo.objectDetectResult);
     }
 
     if (action === 'unlink') {
@@ -95,6 +102,20 @@ export default class ApiResourceService {
         .insert()
         .into(ResourceExifModel)
         .values(exifList)
+        .execute();
+    } catch (e) { } // eat all conflict error
+  }
+
+  private async insertResourceObjectDetectResult(md5: string, objectDetectResult: IObjectDetectResult[]) {
+    try {
+      return await this.resourceObjectModel
+        .createQueryBuilder()
+        .insert()
+        .into(ResourceObjectModel)
+        .values(objectDetectResult.map(i => ({
+          ...i,
+          md5,
+        })))
         .execute();
     } catch (e) { } // eat all conflict error
   }

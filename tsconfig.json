@@ -23,7 +23,8 @@
     },
     "plugins": [{
       "transform": "@zerollup/ts-transform-paths"
-    }]
+    }],
+    "resolveJsonModule": true
   },
   "include": ["src"],
   "exclude": [
