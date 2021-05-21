@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown } from 'antd';
+import { Dropdown, message } from 'antd';
 import { config } from 'ice';
 import classnames from 'classnames';
 
+import fetch from '@/common/fetch';
 import CustomMenu, { CustomMenuItem } from '@/components/CustomMenu';
+import ResourceDetail from '@/components/ResourceDetail';
 import useLocale from '@/hooks/locale';
+import useLoading from '@/hooks/loading';
 
 import styles from './index.module.scss';
 
@@ -19,17 +22,20 @@ interface PropsType {
 
 const ResourceItem = (props: PropsType) => {
   const { photo, itemHeight = 100, itemWidth } = props;
-  const { width, height } = photo;
+  const { width, height, md5 } = photo;
 
   const imageWidth = itemWidth ? itemWidth : Math.floor(width / height * itemHeight);
   const imageResultUrl = `${baseURL}/transcode?md5=${photo.md5}&width=${imageWidth}&height=${itemHeight}`;
 
   const [loading, setLoading] = useState(true);
   const [imageSrc, setImageSrc] = useState('');
+  const [showDetail, setShowDetail] = useState(false);
+  const [resourceDetail, setResourceDetail] = useState<IResourceDetail | null>(null);
+  const [getLocaleText] = useLocale();
+  const [setStoreLoading] = useLoading();
+
   const containerElement = useRef<HTMLDivElement>(null);
   const imageElement = useRef<HTMLImageElement>(null);
-
-  const [getLocaleText] = useLocale();
 
   let observer: IntersectionObserver;
 
@@ -52,7 +58,26 @@ const ResourceItem = (props: PropsType) => {
   }
 
   function handleShowResourceDetail() {
-    console.log(111);
+    setStoreLoading(true);
+    fetch({
+      url: '/resource/detail',
+      params: {
+        md5,
+      },
+    })
+      .then(res => {
+        setResourceDetail(res.data as IResourceDetail);
+        setStoreLoading(false);
+        setShowDetail(true);
+      })
+      .catch(e => {
+        message.error(e.message);
+        setStoreLoading(false);
+      });
+  }
+
+  function handleHideResourceDetail() {
+    setShowDetail(false);
   }
 
   useEffect(() => {
@@ -80,6 +105,7 @@ const ResourceItem = (props: PropsType) => {
           </div>
         </div>
       </div>
+      <ResourceDetail show={showDetail} onConfirm={handleHideResourceDetail} detail={resourceDetail} />
     </div>
   );
 };

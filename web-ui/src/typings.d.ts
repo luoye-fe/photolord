@@ -16,6 +16,20 @@ interface IResourceInfo {
   modifyDate: Date;
 }
 
+interface IResourceDetail {
+  id: number;
+  libraryId: number;
+  md5: string;
+  path: string;
+  name: string;
+  format: string;
+  width: number;
+  height: number;
+  size: number;
+  createDate: Date;
+  modifyDate: Date;
+}
+
 type TreeResourceItem = {
   type: 'resource';
   resourceInfo: IResourceInfo;
